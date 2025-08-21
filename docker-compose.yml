@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:15
+    container_name: store_application_db
+    environment:
+      - POSTGRES_DB=StoreApplicationDB
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
