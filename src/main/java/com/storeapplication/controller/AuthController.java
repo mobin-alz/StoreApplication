@@ -3,6 +3,7 @@ package com.storeapplication.controller;
 import com.storeapplication.dto.request.AuthRequestDto;
 import com.storeapplication.dto.response.AuthResponseDto;
 import com.storeapplication.dto.request.RegisterRequestDto;
+import com.storeapplication.dto.response.BaseResponse;
 import com.storeapplication.dto.response.RegisterResponseDto;
 import com.storeapplication.models.User;
 import com.storeapplication.services.CustomUserDetailsService;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.AuthenticationException;
 
 @RestController
 @RequestMapping("/auth")
@@ -29,26 +33,35 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
     private final UserServiceImpl userService;
+    private PasswordEncoder passwordEncoder;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService userDetailsService, UserServiceImpl userService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService userDetailsService, UserServiceImpl userService, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> createToken(@RequestBody AuthRequestDto request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-
-        if (authentication.isAuthenticated()) {
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-            final String jwt = jwtUtil.generateToken(request.getUsername(), userDetails.getAuthorities());
-            AuthResponseDto response = new AuthResponseDto(jwt, request.getUsername(), userDetails.getAuthorities());
-            return new ResponseEntity<AuthResponseDto>(response, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public ResponseEntity<?> createToken(@RequestBody AuthRequestDto request, HttpServletRequest httpRequest) {
+        try {
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+            Authentication authentication = authenticationManager.authenticate(authToken);
+            System.out.println(authentication.getDetails());
+            if (authentication.isAuthenticated()) {
+                System.out.println("Authentication Successful");
+                final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+                final String jwt = jwtUtil.generateToken(request.getUsername(), userDetails.getAuthorities());
+                AuthResponseDto response = new AuthResponseDto(jwt, request.getUsername(), userDetails.getAuthorities());
+                return new ResponseEntity<AuthResponseDto>(response, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<BaseResponse>(new BaseResponse("Invalid Username Or Password" , false), HttpStatus.UNAUTHORIZED);
+            }
+        } catch (AuthenticationException ex) {
+            System.out.println("Authentication failed: " + ex.getMessage());
+            return new ResponseEntity<BaseResponse>(new BaseResponse("Invalid Username Or Password", false), HttpStatus.UNAUTHORIZED);
         }
     }
 
