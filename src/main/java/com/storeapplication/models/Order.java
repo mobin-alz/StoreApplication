@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,19 +22,20 @@ public class Order {
     private Long id;
 
 
-    private String status;
+    private Long userId;
 
 
-    private Timestamp date;
+    private LocalDateTime date;
 
 
-    private String paymentType;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status ;
 
 
+    private BigDecimal totalAmount;
 
-    @ManyToOne
-    @JoinColumn(name="user_id")
-    private User user;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderProduct> orderProducts;
 
 
 

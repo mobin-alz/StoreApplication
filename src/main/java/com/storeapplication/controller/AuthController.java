@@ -44,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> createToken(@RequestBody AuthRequestDto request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(@RequestBody AuthRequestDto request, HttpServletRequest httpRequest) {
         try {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
