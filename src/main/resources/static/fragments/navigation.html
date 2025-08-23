@@ -1,0 +1,65 @@
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <h1>فروشگاه آنلاین</h1>
+            </div>
+
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="/">صفحه اصلی</a></li>
+                    <li><a href="/products">محصولات</a></li>
+                    <li><a href="/categories">دسته‌بندی‌ها</a></li>
+                    <li><a href="/about">درباره ما</a></li>
+                    <li><a href="/contact">تماس با ما</a></li>
+                </ul>
+            </nav>
+
+            <!-- Guest User Buttons (shown when not logged in) -->
+            <div class="auth-buttons" id="guest-buttons">
+                <a href="/login" class="btn btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    ورود
+                </a>
+                <a href="/register" class="btn btn-register">
+                    <i class="fas fa-user-plus"></i>
+                    ثبت‌نام
+                </a>
+            </div>
+
+            <!-- Logged In User Dropdown (hidden by default) -->
+            <div class="user-dropdown" id="user-dropdown" style="display: none">
+                <div class="dropdown-trigger" onclick="toggleDropdown()">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="user-name">کاربر</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <div class="dropdown-header">
+                        <i class="fas fa-user"></i>
+                        <span id="dropdown-username">کاربر</span>
+                        <small id="dropdown-role">کاربر عادی</small>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="/dashboard" class="dropdown-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        داشبورد
+                    </a>
+                    <a href="/profile" class="dropdown-item">
+                        <i class="fas fa-user-edit"></i>
+                        پروفایل
+                    </a>
+                    <a href="/orders" class="dropdown-item">
+                        <i class="fas fa-box"></i>
+                        سفارشات
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        خروج
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

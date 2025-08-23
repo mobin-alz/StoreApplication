@@ -18,4 +18,18 @@ public class WebController {
         model.addAttribute("count", 10);
         return "products";
     }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/register")
+    public String register() {
+        return "register";
+    }
+    @GetMapping("/dashboard")
+    public String dashboard() {
+    return "dashboard";
+    }
 }
