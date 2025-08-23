@@ -33,7 +33,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
     private final UserServiceImpl userService;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService userDetailsService, UserServiceImpl userService, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
@@ -49,12 +49,11 @@ public class AuthController {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
             Authentication authentication = authenticationManager.authenticate(authToken);
-            System.out.println(authentication.getDetails());
             if (authentication.isAuthenticated()) {
-                System.out.println("Authentication Successful");
                 final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-                final String jwt = jwtUtil.generateToken(request.getUsername(), userDetails.getAuthorities());
-                AuthResponseDto response = new AuthResponseDto(jwt, request.getUsername(), userDetails.getAuthorities());
+                User user = userDetailsService.loadUserInfoByUsername(request.getUsername());
+                final String jwt = jwtUtil.generateToken(user.getId(),request.getUsername(), userDetails.getAuthorities());
+                AuthResponseDto response = new AuthResponseDto(jwt, request.getUsername(), userDetails.getAuthorities(), user.getId());
                 return new ResponseEntity<AuthResponseDto>(response, HttpStatus.OK);
             } else {
                 return new ResponseEntity<BaseResponse>(new BaseResponse("Invalid Username Or Password" , false), HttpStatus.UNAUTHORIZED);
