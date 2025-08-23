@@ -1,16 +1,16 @@
 package com.storeapplication.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OrderProduct {
 
     @Id
@@ -18,17 +18,14 @@ public class OrderProduct {
     private Long id;
 
 
-    private String name;
-
-    private int quantity;
-
-    private float price;
-
-    private String image;
-
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
+
+
+    private int quantity;
+
+    private BigDecimal priceAtOrderTime;
 
 
 }

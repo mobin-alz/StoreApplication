@@ -6,23 +6,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
+import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShoppingCart {
+public class CartItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User user;
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private ShoppingCart cart;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> cartItems;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
+    private int quantity;
+    private BigDecimal price;
 }

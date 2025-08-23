@@ -17,14 +17,18 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public String generateToken(String username, Collection<? extends GrantedAuthority> authorities) {
+    public String generateToken(Long id, String username, Collection<? extends GrantedAuthority> authorities) {
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
+
         long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
+
         return Jwts.builder()
                 .setClaims(claims)
+                .addClaims(Map.of("id", id))
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))

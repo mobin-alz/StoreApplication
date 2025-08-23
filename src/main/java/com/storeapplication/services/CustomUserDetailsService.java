@@ -41,6 +41,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         );
     }
 
+    public User loadUserInfoByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findUserByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    }
+
 
     public static boolean requireRole(HttpServletRequest request, JwtUtil jwtUtil, String requiredRole) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
