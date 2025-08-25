@@ -1,6 +1,5 @@
 package com.storeapplication.dto.response;
 
-import com.storeapplication.models.User;
 import lombok.*;
 
 @Data

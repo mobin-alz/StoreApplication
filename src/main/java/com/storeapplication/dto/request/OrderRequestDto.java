@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,5 +12,4 @@ import java.util.List;
 public class OrderRequestDto {
     private Long userId;
     private BigDecimal totalAmount;
-    private List<OrderProductRequestDto> orderProducts;
 } 

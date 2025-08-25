@@ -45,17 +45,7 @@ public class OrderController {
         order.setTotalAmount(orderDto.getTotalAmount());
         
         List<OrderProduct> orderProducts = new ArrayList<>();
-        for (OrderProductRequestDto productDto : orderDto.getOrderProducts()) {
-            Product product = productService.getProductById(productDto.getProductId());
-            if (product != null) {
-                OrderProduct orderProduct = new OrderProduct();
-                orderProduct.setOrder(order);
-                orderProduct.setProduct(product);
-                orderProduct.setQuantity(productDto.getQuantity());
-                orderProduct.setPriceAtOrderTime(productDto.getPriceAtOrderTime());
-                orderProducts.add(orderProduct);
-            }
-        }
+
         order.setOrderProducts(orderProducts);
         
         return order;
