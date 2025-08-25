@@ -1,54 +1,77 @@
-// Dashboard page functionality
+// Dashboard JavaScript
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("Dashboard page loaded");
+    // Wait for common functions to be available
+    setTimeout(() => {
+        if (typeof loadNavigation === "function") {
+            loadNavigation();
+        }
+        if (typeof loadFooter === "function") {
+            loadFooter();
+        }
 
-    // Check if user is logged in
-    const token = localStorage.getItem("token");
-    if (!token) {
-        // Redirect to login if not authenticated
-        window.location.href = "/login";
-        return;
-    }
+        // Load user data after navigation is loaded
+        loadUserData();
 
-    // Load user data and update dashboard
-    loadUserData();
-    console.log("User is authenticated, dashboard ready");
+        // Start token expiration check
+        setInterval(checkTokenExpiration, 60000); // Check every minute
+    }, 100);
 });
 
-function loadUserData() {
-    const username = localStorage.getItem("username");
-    const roles = localStorage.getItem("roles");
-
-    // Update dashboard welcome message
-    const welcomeTitle = document.querySelector(".welcome-message h3");
-    if (welcomeTitle && username) {
-        welcomeTitle.textContent = `خوش آمدید ${username}!`;
-    }
-
-    // Update role information if available
-    if (roles) {
-        try {
-            const rolesArray = JSON.parse(roles);
-            const role = rolesArray[0]?.authority || "USER";
-            const roleText =
-                role === "USER"
-                    ? "کاربر عادی"
-                    : role === "PROVIDER"
-                    ? "فروشنده"
-                    : role === "ADMIN"
-                    ? "مدیر"
-                    : "کاربر";
-
-            // You can add role-specific content here
-            console.log(`User role: ${roleText}`);
-        } catch (e) {
-            console.error("Error parsing roles:", e);
+// Load user data and update dashboard
+async function loadUserData() {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = "/login";
+            return;
         }
-    }
-}
 
-// Add any dashboard-specific functions here
-function refreshDashboard() {
-    console.log("Refreshing dashboard...");
-    // Add refresh logic here later
+        const username = localStorage.getItem("username");
+        const roles = localStorage.getItem("roles");
+
+        if (username) {
+            // Update welcome message
+            const welcomeMessage = document.querySelector(
+                ".welcome-message h3"
+            );
+            if (welcomeMessage) {
+                welcomeMessage.textContent = `خوش آمدید ${username}!`;
+            }
+
+            // Check if user has PROVIDER or ADMIN role to show provider-only section
+            if (roles) {
+                try {
+                    const rolesArray = JSON.parse(roles);
+                    const hasProviderRole = rolesArray.some(
+                        (role) =>
+                            role.authority === "PROVIDER" ||
+                            role.authority === "ADMIN"
+                    );
+
+                    const providerSection =
+                        document.querySelector(".provider-only");
+                    if (providerSection) {
+                        providerSection.style.display = hasProviderRole
+                            ? "block"
+                            : "none";
+                    }
+                } catch (e) {
+                    console.error("Error parsing roles:", e);
+                }
+            }
+
+            // Wait for navigation to load, then update it
+            setTimeout(() => {
+                if (typeof window.updateNavigationState === "function") {
+                    window.updateNavigationState();
+                } else {
+                    // Fallback: update navigation manually
+                    updateNavigationState();
+                }
+            }, 100);
+        }
+    } catch (error) {
+        console.error("Error loading user data:", error);
+        showMessage("خطا در بارگذاری اطلاعات کاربر", "error");
+    }
 }

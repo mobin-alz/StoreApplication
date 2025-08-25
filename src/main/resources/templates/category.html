@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>دسته‌بندی‌ها - فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/category.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="nav-placeholder"></div>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>دسته‌بندی‌های محصولات</h1>
+                        <p>تمام دسته‌بندی‌های موجود در فروشگاه</p>
+                    </div>
+                </div>
+
+                <!-- Categories Grid -->
+                <div class="categories-container">
+                    <div class="categories-grid" id="categories-grid">
+                        <!-- Categories will be loaded here -->
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loading-state" class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>در حال بارگذاری دسته‌بندی‌ها...</p>
+                    </div>
+
+                    <!-- No Categories State -->
+                    <div
+                        id="no-categories"
+                        class="no-categories"
+                        style="display: none"
+                    >
+                        <i class="fas fa-tags"></i>
+                        <h3>دسته‌بندی‌ای موجود نیست</h3>
+                        <p>در حال حاضر هیچ دسته‌بندی تعریف نشده است.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="footer-placeholder"></div>
+
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/category.js"></script>
+    </body>
+</html>

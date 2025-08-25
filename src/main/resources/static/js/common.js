@@ -16,6 +16,9 @@ function loadNavigation() {
         .catch((error) => console.error("Error loading navigation:", error));
 }
 
+// Make function globally accessible
+window.loadNavigation = loadNavigation;
+
 function loadFooter() {
     fetch("/fragments/footer.html")
         .then((response) => response.text())
@@ -24,6 +27,9 @@ function loadFooter() {
         })
         .catch((error) => console.error("Error loading footer:", error));
 }
+
+// Make function globally accessible
+window.loadFooter = loadFooter;
 
 // Update navigation based on authentication state
 function updateNavigationState() {
@@ -71,6 +77,9 @@ function updateNavigationState() {
     }
 }
 
+// Make function globally accessible
+window.updateNavigationState = updateNavigationState;
+
 // Toggle dropdown menu
 function toggleDropdown() {
     const dropdownMenu = document.getElementById("dropdown-menu");
@@ -78,6 +87,9 @@ function toggleDropdown() {
         dropdownMenu.classList.toggle("show");
     }
 }
+
+// Make function globally accessible
+window.toggleDropdown = toggleDropdown;
 
 // Close dropdown when clicking outside
 document.addEventListener("click", function (event) {
@@ -93,6 +105,7 @@ document.addEventListener("click", function (event) {
 
 // Logout function
 function logout() {
+    // Clear all authentication data
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     localStorage.removeItem("userId");
@@ -107,6 +120,9 @@ function logout() {
     // Show logout message
     showMessage("خروج موفقیت‌آمیز بود", "success");
 }
+
+// Make function globally accessible
+window.logout = logout;
 
 // Show message function (reusable)
 function showMessage(message, type) {
@@ -131,25 +147,109 @@ function showMessage(message, type) {
         z-index: 3000;
         animation: slideIn 0.3s ease;
         max-width: 400px;
-        text-align: center;
+        word-wrap: break-word;
     `;
 
-    if (type === "success") {
-        messageDiv.style.backgroundColor = "#28a745";
-    } else {
-        messageDiv.style.backgroundColor = "#dc3545";
+    // Set background color based on message type
+    switch (type) {
+        case "success":
+            messageDiv.style.backgroundColor = "#28a745";
+            break;
+        case "error":
+            messageDiv.style.backgroundColor = "#dc3545";
+            break;
+        case "warning":
+            messageDiv.style.backgroundColor = "#ffc107";
+            messageDiv.style.color = "#212529";
+            break;
+        default:
+            messageDiv.style.backgroundColor = "#17a2b8";
     }
 
     // Add to page
     document.body.appendChild(messageDiv);
 
-    // Remove after 5 seconds
+    // Remove after 3 seconds
     setTimeout(() => {
         messageDiv.style.animation = "slideOut 0.3s ease";
         setTimeout(() => {
             if (messageDiv.parentNode) {
-                messageDiv.parentNode.removeChild(messageDiv);
+                document.body.removeChild(messageDiv);
             }
         }, 300);
-    }, 5000);
+    }, 3000);
 }
+
+// Make function globally accessible
+window.showMessage = showMessage;
+
+// Add CSS animations
+const commonStyle = document.createElement("style");
+commonStyle.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(commonStyle);
+
+// Add this function to check token expiration proactively
+function checkTokenExpiration() {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+        // Decode JWT payload (without verification)
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const expirationTime = payload.exp * 1000; // Convert to milliseconds
+        const currentTime = Date.now();
+
+        // If token expires in next 5 minutes, show warning
+        if (expirationTime - currentTime < 5 * 60 * 1000) {
+            showMessage(
+                "جلسه شما به زودی منقضی می‌شود. لطفاً دوباره وارد شوید.",
+                "warning"
+            );
+        }
+
+        // If token is expired, logout immediately
+        if (currentTime >= expirationTime) {
+            logout();
+            showMessage(
+                "جلسه شما منقضی شده است. لطفاً دوباره وارد شوید.",
+                "error"
+            );
+        }
+    } catch (error) {
+        console.error("Error decoding token:", error);
+        // If token is malformed, consider it expired and log out
+        logout();
+        showMessage("توکن نامعتبر است. لطفاً دوباره وارد شوید.", "error");
+    }
+}
+
+// Make function globally accessible
+window.checkTokenExpiration = checkTokenExpiration;
+
+// Check token expiration every minute
+setInterval(checkTokenExpiration, 60000);
+
+// Also check when page loads
+document.addEventListener("DOMContentLoaded", checkTokenExpiration);

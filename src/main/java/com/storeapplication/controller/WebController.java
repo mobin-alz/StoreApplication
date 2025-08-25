@@ -28,8 +28,34 @@ public class WebController {
     public String register() {
         return "register";
     }
+    
     @GetMapping("/dashboard")
     public String dashboard() {
-    return "dashboard";
+        return "dashboard";
+    }
+
+    @GetMapping("/categories")
+    public String categories() {
+        return "category";
+    }
+    
+    @GetMapping("/dashboard/category")
+    public String dashboardCategory() {
+        return "categories";
+    }
+    
+    @GetMapping("/dashboard/products")
+    public String dashboardProducts() {
+        return "dashboard-products";
+    }
+    
+    @GetMapping("/about")
+    public String about() {
+        return "about";
+    }
+    
+    @GetMapping("/contact")
+    public String contact() {
+        return "contact";
     }
 }

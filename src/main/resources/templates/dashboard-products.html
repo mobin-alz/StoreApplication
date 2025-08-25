@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>مدیریت محصولات - داشبورد</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/dashboard.css" />
+        <link rel="stylesheet" href="/css/dashboard-products.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="nav-placeholder"></div>
+
+        <main class="main-content">
+            <div class="container">
+                <div class="dashboard-products">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <div
+                            class="header-content"
+                            style="justify-self: center"
+                        >
+                            <h1
+                                style="
+                                    font-size: 2.8rem;
+                                    color: #2d3748;
+                                    margin-bottom: 1.5rem;
+                                    font-weight: 700;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 1.5rem;
+                                    background: linear-gradient(
+                                        135deg,
+                                        #a8edea,
+                                        #fed6e3
+                                    );
+                                    -webkit-background-clip: text;
+                                    -webkit-text-fill-color: transparent;
+                                    background-clip: text;
+                                "
+                            >
+                                مدیریت کالا ها
+                            </h1>
+                        </div>
+                    </div>
+
+                    <!-- Create Product Section -->
+                    <div
+                        class="create-product-section"
+                        id="create-product-section"
+                        style="display: none"
+                    >
+                        <div class="section-header">
+                            <h3>
+                                <i class="fas fa-plus-circle"></i>
+                                ایجاد کالا جدید
+                            </h3>
+                        </div>
+
+                        <form id="create-product-form" class="product-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="product-name">
+                                        <i class="fas fa-tag"></i>
+                                        نام محصول
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="product-name"
+                                        class="enhanced-input"
+                                        required
+                                    />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="product-category">
+                                        <i class="fas fa-folder"></i>
+                                        دسته‌بندی
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select
+                                        id="product-category"
+                                        class="enhanced-input"
+                                        required
+                                    >
+                                        <option value="">
+                                            انتخاب دسته‌بندی
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-description">
+                                    <i class="fas fa-align-left"></i>
+                                    توضیحات محصول
+                                    <span class="required">*</span>
+                                </label>
+                                <textarea
+                                    id="product-description"
+                                    class="enhanced-input"
+                                    rows="4"
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="product-price">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        قیمت (تومان)
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="product-price"
+                                        class="enhanced-input"
+                                        min="0"
+                                        step="1000"
+                                        required
+                                    />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="product-discount">
+                                        <i class="fas fa-percentage"></i>
+                                        درصد تخفیف
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="product-discount"
+                                        class="enhanced-input"
+                                        min="0"
+                                        max="100"
+                                        step="1"
+                                    />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="product-quantity">
+                                        <i class="fas fa-boxes"></i>
+                                        موجودی <span class="required">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="product-quantity"
+                                        class="enhanced-input"
+                                        min="0"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-image">
+                                    <i class="fas fa-image"></i>
+                                    تصویر محصول <span class="required">*</span>
+                                </label>
+                                <div class="file-upload-wrapper">
+                                    <input
+                                        type="file"
+                                        id="product-image"
+                                        class="file-input enhanced"
+                                        accept="image/*"
+                                        required
+                                    />
+                                    <label
+                                        for="product-image"
+                                        class="file-upload-label"
+                                    >
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>برای انتخاب تصویر کلیک کنید</span>
+                                    </label>
+                                </div>
+                                <div
+                                    id="image-preview"
+                                    class="file-preview"
+                                    style="display: none"
+                                >
+                                    <img
+                                        id="preview-image"
+                                        src=""
+                                        alt="Preview"
+                                    />
+                                    <button
+                                        type="button"
+                                        class="remove-image"
+                                        onclick="removeImage()"
+                                    >
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button
+                                    type="submit"
+                                    class="btn-enhanced btn-primary"
+                                >
+                                    <i class="fas fa-save"></i>
+                                    ایجاد کالا
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn-enhanced btn-secondary"
+                                    onclick="cancelCreate()"
+                                >
+                                    <i class="fas fa-times"></i>
+                                    انصراف
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Products Management Section -->
+                    <div class="products-management-section">
+                        <div class="section-header">
+                            <div class="header-left">
+                                <h3>
+                                    <i class="fas fa-list"></i>
+                                    لیست کالا ها
+                                </h3>
+                                <div class="product-count" id="product-count">
+                                    0 کالا
+                                </div>
+                            </div>
+                            <button
+                                id="create-product-btn"
+                                class="btn-enhanced btn-primary"
+                                onclick="showCreateForm()"
+                            >
+                                <i class="fas fa-plus"></i>
+                                ایجاد کالا جدید
+                            </button>
+                        </div>
+
+                        <!-- Products Grid -->
+                        <div class="products-grid" id="products-grid">
+                            <!-- Products will be loaded here -->
+                        </div>
+
+                        <!-- Loading State -->
+                        <div id="loading-state" class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>در حال بارگذاری کالا ها...</p>
+                        </div>
+
+                        <!-- No Products State -->
+                        <div
+                            id="no-products"
+                            class="no-products"
+                            style="display: none"
+                        >
+                            <i class="fas fa-box-open"></i>
+                            <h3>کالایی موجود نیست</h3>
+                            <p>اولین کالا را ایجاد کنید!</p>
+                        </div>
+                        <div class="dashboard-actions">
+                            <a
+                                href="/dashboard"
+                                class="btn btn-secondary btn-enhanced"
+                                style="margin-bottom: 10px"
+                            >
+                                <i class="fas fa-arrow-right"></i>
+                                بازگشت به داشبورد
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Edit Product Modal -->
+        <div class="modal enhanced-modal" id="editModal" style="display: none">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <i class="fas fa-edit"></i>
+                        ویرایش کالا
+                    </h3>
+                    <button
+                        class="close-btn enhanced"
+                        onclick="closeEditModal()"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm" class="product-form">
+                        <input type="hidden" id="editProductId" />
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editProductName">
+                                    <i class="fas fa-tag"></i>
+                                    نام کالا <span class="required">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="editProductName"
+                                    class="enhanced-input"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editProductCategory">
+                                    <i class="fas fa-folder"></i>
+                                    دسته‌بندی <span class="required">*</span>
+                                </label>
+                                <select
+                                    id="editProductCategory"
+                                    class="enhanced-input"
+                                    required
+                                >
+                                    <option value="">انتخاب دسته‌بندی</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editProductDescription">
+                                <i class="fas fa-align-left"></i>
+                                توضیحات کالا <span class="required">*</span>
+                            </label>
+                            <textarea
+                                id="editProductDescription"
+                                class="enhanced-input"
+                                rows="4"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editProductPrice">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    قیمت (تومان) <span class="required">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    id="editProductPrice"
+                                    class="enhanced-input"
+                                    min="0"
+                                    step="1000"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editProductDiscount">
+                                    <i class="fas fa-percentage"></i>
+                                    درصد تخفیف
+                                </label>
+                                <input
+                                    type="number"
+                                    id="editProductDiscount"
+                                    class="enhanced-input"
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editProductQuantity">
+                                    <i class="fas fa-boxes"></i>
+                                    موجودی <span class="required">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    id="editProductQuantity"
+                                    class="enhanced-input"
+                                    min="0"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editProductImage">
+                                <i class="fas fa-image"></i>
+                                تصویر کالا (اختیاری)
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input
+                                    type="file"
+                                    id="editProductImage"
+                                    class="file-input enhanced"
+                                    accept="image/*"
+                                />
+                                <label
+                                    for="editProductImage"
+                                    class="file-upload-label"
+                                >
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>برای تغییر تصویر کلیک کنید</span>
+                                </label>
+                            </div>
+                            <div
+                                id="editImagePreview"
+                                class="file-preview"
+                                style="display: none"
+                            >
+                                <img id="editPreviewImg" src="" alt="Preview" />
+                                <button
+                                    type="button"
+                                    class="remove-image"
+                                    onclick="removeEditImage()"
+                                >
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button
+                                type="submit"
+                                class="btn-enhanced btn-primary"
+                            >
+                                <i class="fas fa-save"></i>
+                                ذخیره تغییرات
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-enhanced btn-secondary"
+                                onclick="closeEditModal()"
+                            >
+                                <i class="fas fa-times"></i>
+                                انصراف
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div
+            class="modal confirmation-modal"
+            id="confirmModal"
+            style="display: none"
+        >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        تأیید حذف
+                    </h3>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage">
+                        آیا از حذف این کالا اطمینان دارید؟
+                    </p>
+                    <p class="warning-text">این عملیات قابل بازگشت نیست!</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-danger" onclick="confirmDelete()">
+                        <i class="fas fa-trash"></i>
+                        حذف
+                    </button>
+                    <button
+                        class="btn btn-secondary"
+                        onclick="closeConfirmModal()"
+                    >
+                        <i class="fas fa-times"></i>
+                        انصراف
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/dashboard-products.js"></script>
+    </body>
+</html>

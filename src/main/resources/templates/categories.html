@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>مدیریت دسته‌بندی‌ها | فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/categories.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="nav-placeholder"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <div class="dashboard-container">
+                    <div class="dashboard-card">
+                        <div class="dashboard-header">
+                            <h2>مدیریت دسته‌بندی‌ها</h2>
+                            <p>ایجاد، ویرایش و حذف دسته‌بندی‌های محصولات</p>
+                        </div>
+
+                        <div class="dashboard-content">
+                            <!-- Create Category Section -->
+                            <div
+                                class="create-category-section"
+                                id="create-category-section"
+                                style="display: none"
+                            >
+                                <div class="section-header">
+                                    <h3>
+                                        <i class="fas fa-plus-circle"></i>
+                                        ایجاد دسته‌بندی جدید
+                                    </h3>
+                                </div>
+
+                                <form
+                                    id="create-category-form"
+                                    enctype="multipart/form-data"
+                                >
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="category-name">
+                                                <i class="fas fa-tag"></i>
+                                                نام دسته‌بندی
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="category-name"
+                                                name="categoryName"
+                                                class="enhanced-input"
+                                                placeholder="نام دسته‌بندی را وارد کنید"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="category-image">
+                                                <i class="fas fa-image"></i>
+                                                تصویر دسته‌بندی
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="file-upload-wrapper">
+                                                <input
+                                                    type="file"
+                                                    id="category-image"
+                                                    name="image"
+                                                    class="file-input enhanced"
+                                                    accept="image/*"
+                                                    required
+                                                />
+                                                <label
+                                                    for="category-image"
+                                                    class="file-upload-label"
+                                                >
+                                                    <i
+                                                        class="fas fa-cloud-upload-alt"
+                                                    ></i>
+                                                    <span
+                                                        >برای انتخاب تصویر کلیک
+                                                        کنید</span
+                                                    >
+                                                </label>
+                                            </div>
+                                            <div
+                                                class="file-preview"
+                                                id="image-preview"
+                                                style="display: none"
+                                            >
+                                                <img
+                                                    id="preview-image"
+                                                    src=""
+                                                    alt="پیش‌نمایش تصویر"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    class="remove-image"
+                                                    onclick="removeImage()"
+                                                >
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary btn-enhanced"
+                                            onclick="cancelCreate()"
+                                        >
+                                            <i class="fas fa-times"></i>
+                                            انصراف
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary btn-enhanced"
+                                        >
+                                            <i class="fas fa-save"></i>
+                                            ایجاد دسته‌بندی
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Categories List Section -->
+                            <div class="categories-section">
+                                <div class="section-header">
+                                    <div class="header-left">
+                                        <h3>
+                                            <i class="fas fa-tags"></i>
+                                            دسته‌ بندی‌ های موجود
+                                        </h3>
+                                        <span
+                                            class="category-count"
+                                            id="category-count"
+                                            >0 دسته‌ بندی</span
+                                        >
+                                    </div>
+                                    <button
+                                        class="btn btn-primary btn-enhanced"
+                                        onclick="showCreateForm()"
+                                        id="create-btn"
+                                    >
+                                        <i class="fas fa-plus"></i>
+                                        دسته‌بندی جدید
+                                    </button>
+                                </div>
+
+                                <div
+                                    class="categories-grid"
+                                    id="categories-grid"
+                                >
+                                    <!-- Categories will be loaded here -->
+                                </div>
+                            </div>
+
+                            <div class="dashboard-actions">
+                                <a
+                                    href="/dashboard"
+                                    class="btn btn-secondary btn-enhanced"
+                                    style="margin-bottom: 10px"
+                                >
+                                    <i class="fas fa-arrow-right"></i>
+                                    بازگشت به داشبورد
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Enhanced Edit Category Modal -->
+        <div class="modal enhanced-modal" id="editModal" style="display: none">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>ویرایش دسته‌بندی</h3>
+                    <button
+                        class="close-btn enhanced"
+                        onclick="closeEditModal()"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form class="edit-form" id="editForm" style="padding: 15px">
+                    <input type="hidden" id="editCategoryId" />
+
+                    <div class="form-group" style="margin-top: 10px">
+                        <label for="editCategoryName">
+                            <i class="fas fa-tag"></i>
+                            نام دسته‌بندی *
+                        </label>
+                        <input
+                            type="text"
+                            id="editCategoryName"
+                            name="categoryName"
+                            required
+                            class="enhanced-input"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCategoryImage">
+                            <i class="fas fa-image"></i>
+                            تصویر جدید
+                        </label>
+                        <div class="file-upload-wrapper">
+                            <input
+                                type="file"
+                                id="editCategoryImage"
+                                name="image"
+                                accept="image/*"
+                                class="file-input enhanced"
+                            />
+                            <div class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>تصویر جدید انتخاب کنید</span>
+                            </div>
+                        </div>
+                        <div
+                            class="file-preview"
+                            id="editImagePreview"
+                            style="display: none"
+                        >
+                            <img id="editPreviewImg" alt="پیش‌ نمایش تصویر" />
+                            <button
+                                type="button"
+                                class="remove-image"
+                                onclick="removeEditImage()"
+                            >
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-enhanced"
+                        >
+                            <i class="fas fa-save"></i>
+                            ذخیره تغییرات
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary btn-enhanced"
+                            onclick="closeEditModal()"
+                        >
+                            انصراف
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div
+            class="modal confirmation-modal"
+            id="confirmModal"
+            style="display: none"
+        >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 style="justify-self: center">
+                        <i class="fas fa-exclamation-triangle"></i> تأیید حذف
+                    </h3>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage">
+                        آیا از حذف این دسته‌بندی اطمینان دارید؟
+                    </p>
+                    <p class="warning-text">این عمل قابل بازگشت نیست!</p>
+                </div>
+                <div class="modal-actions">
+                    <button
+                        class="btn btn-danger btn-enhanced"
+                        onclick="confirmDelete()"
+                    >
+                        بله، حذف کن
+                    </button>
+                    <button
+                        class="btn btn-secondary btn-enhanced"
+                        onclick="closeConfirmModal()"
+                    >
+                        انصراف
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/categories.js"></script>
+    </body>
+</html>

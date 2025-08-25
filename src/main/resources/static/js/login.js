@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 password: document.getElementById("password").value,
             };
 
+            // Use regular fetch for login (no token needed)
             const response = await fetch("/auth/login", {
                 method: "POST",
                 headers: {
@@ -40,9 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify(formData),
             });
 
-            const data = await response.json();
+            if (response && response.ok) {
+                const data = await response.json();
 
-            if (response.ok) {
                 // Store token and user info
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("username", data.username);
@@ -59,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     window.location.href = "/";
                 }, 2000);
             } else {
+                const data = await response.json();
                 showMessage(
                     data.message || "نام کاربری یا رمز عبور اشتباه است",
                     "error"

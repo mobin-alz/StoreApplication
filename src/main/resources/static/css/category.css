@@ -1,0 +1,285 @@
+/* Public Category Page Styles */
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 3rem;
+    margin-bottom: 3rem;
+    margin-top: 7rem;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.page-header .header-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.page-header .header-content h1 i {
+    margin-left: 1rem;
+    color: #ffd700;
+}
+
+.page-header .header-content p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.categories-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.category-overlay {
+    text-align: center;
+}
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.category-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    padding: 0.5rem;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.category-card:hover .category-image img {
+    transform: scale(1.1);
+}
+
+.category-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.category-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.category-image .category-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.1) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+.category-card:hover .category-overlay {
+    opacity: 1;
+}
+
+.category-overlay .view-products-btn {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.category-overlay .view-products-btn:hover {
+    background: white;
+    transform: scale(1.05);
+}
+
+.category-info {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.category-info h3 {
+    font-size: 1.4rem;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.category-info .category-description {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.category-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.category-stat {
+    text-align: center;
+    color: #666;
+}
+
+.category-stat .stat-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #667eea;
+    display: block;
+}
+
+.category-stat .stat-label {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.loading-state i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.loading-state p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* No Categories State */
+.no-categories {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.no-categories i {
+    font-size: 4rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+.no-categories h3 {
+    font-size: 1.5rem;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.no-categories p {
+    font-size: 1.1rem;
+    margin: 0;
+    color: #999;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 2rem 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .page-header .header-content h1 {
+        font-size: 2rem;
+    }
+
+    .page-header .header-content p {
+        font-size: 1rem;
+    }
+
+    .categories-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .category-card {
+        border-radius: 15px;
+    }
+
+    .category-info {
+        padding: 1rem;
+    }
+
+    .category-info h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header .header-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .categories-grid {
+        padding: 0 0.5rem;
+    }
+
+    .category-image {
+        height: 150px;
+    }
+}
+
+/* Animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.category-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.category-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+.category-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.category-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+.category-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+.category-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+.category-card:nth-child(6) {
+    animation-delay: 0.6s;
+}

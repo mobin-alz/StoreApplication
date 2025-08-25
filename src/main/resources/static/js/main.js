@@ -2,7 +2,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     const token = localStorage.getItem("token");
     if (token) {
-        updateAuthUI(true);
+        // Wait for navigation to load first
+        setTimeout(() => {
+            updateAuthUI(true);
+        }, 100);
     }
 });
 
@@ -50,6 +53,9 @@ function showMessage(message, type) {
 function updateAuthUI(isLoggedIn) {
     const authButtons = document.querySelector(".auth-buttons");
 
+    // Check if element exists before using it
+    if (!authButtons) return;
+
     if (isLoggedIn) {
         const username = localStorage.getItem("username");
         authButtons.innerHTML = `
@@ -67,7 +73,7 @@ function updateAuthUI(isLoggedIn) {
             </a>
             <a href="/register" class="btn btn-register">
                 <i class="fas fa-user-plus"></i>
-                ثبت‌نام
+                ثبت‌ نام
             </a>
         `;
     }
@@ -84,8 +90,8 @@ function logout() {
 }
 
 // Add CSS animations
-const style = document.createElement("style");
-style.textContent = `
+const mainStyle = document.createElement("style");
+mainStyle.textContent = `
     @keyframes slideIn {
         from {
             transform: translateX(100%);
@@ -114,4 +120,4 @@ style.textContent = `
         margin-left: 1rem;
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(mainStyle);

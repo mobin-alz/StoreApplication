@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>تماس با ما - فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/contact.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="app">
+            <!-- Navigation Placeholder -->
+            <div id="nav-placeholder"></div>
+
+            <!-- Main Content -->
+            <main class="contact-page">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1 class="hero-title">تماس با ما</h1>
+                            <p class="hero-subtitle">
+                                ما آماده پاسخگویی به سوالات و پیشنهادات شما
+                                هستیم
+                            </p>
+                            <div class="hero-features">
+                                <div class="feature-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>۲۴/۷ پشتیبانی</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>پاسخ سریع</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-comments"></i>
+                                    <span>گفتگوی زنده</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-image">
+                            <div class="image-container">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Contact Info Section -->
+                <section class="contact-info-section">
+                    <div class="container">
+                        <div class="section-header">
+                            <h2>اطلاعات تماس</h2>
+                            <p>از طریق روش‌های مختلف با ما در ارتباط باشید</p>
+                        </div>
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <h3>تلفن تماس</h3>
+                                <p class="method-detail">۰۲۱-۱۲۳۴۵۶۷۸</p>
+                                <p class="method-detail">۰۹۱۲-۱۲۳-۴۵۶۷</p>
+                                <p class="method-description">
+                                    شنبه تا چهارشنبه: ۸ صبح تا ۶ عصر
+                                </p>
+                            </div>
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <h3>ایمیل</h3>
+                                <p class="method-detail">info@store.com</p>
+                                <p class="method-detail">support@store.com</p>
+                                <p class="method-description">
+                                    پاسخ در کمتر از ۲۴ ساعت
+                                </p>
+                            </div>
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <h3>آدرس</h3>
+                                <p class="method-detail">
+                                    تبریز، خیابان آبرسان
+                                </p>
+                                <p class="method-detail">پلاک ۱۲۳، طبقه ۲</p>
+                                <p class="method-description">
+                                    دفتر مرکزی شرکت
+                                </p>
+                            </div>
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <h3>گفتگوی زنده</h3>
+                                <p class="method-detail">چت آنلاین</p>
+                                <p class="method-detail">واتساپ: 09126555225</p>
+                                <p class="method-description">
+                                    پاسخ فوری به سوالات
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Contact Form Section -->
+                <section class="contact-form-section">
+                    <div class="container">
+                        <div class="form-container">
+                            <div class="form-header">
+                                <h2>فرم تماس</h2>
+                                <p>پیام خود را برای ما ارسال کنید</p>
+                            </div>
+                            <form class="contact-form" id="contactForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="firstName">نام *</label>
+                                        <input
+                                            type="text"
+                                            id="firstName"
+                                            name="firstName"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName"
+                                            >نام خانوادگی *</label
+                                        >
+                                        <input
+                                            type="text"
+                                            id="lastName"
+                                            name="lastName"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="email">ایمیل *</label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">شماره تماس</label>
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            name="phone"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">موضوع *</label>
+                                    <select
+                                        id="subject"
+                                        name="subject"
+                                        required
+                                    >
+                                        <option value="">انتخاب کنید</option>
+                                        <option value="general">
+                                            سوال عمومی
+                                        </option>
+                                        <option value="support">
+                                            پشتیبانی فنی
+                                        </option>
+                                        <option value="complaint">شکایت</option>
+                                        <option value="suggestion">
+                                            پیشنهاد
+                                        </option>
+                                        <option value="partnership">
+                                            همکاری
+                                        </option>
+                                        <option value="other">سایر</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message">پیام *</label>
+                                    <textarea
+                                        id="message"
+                                        name="message"
+                                        rows="6"
+                                        required
+                                        placeholder="پیام خود را اینجا بنویسید..."
+                                    ></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary submit-btn"
+                                    >
+                                        <i class="fas fa-paper-plane"></i>
+                                        ارسال پیام
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FAQ Section -->
+                <section class="faq-section">
+                    <div class="container">
+                        <div class="section-header">
+                            <h2>سوالات متداول</h2>
+                            <p>پاسخ سوالات پرتکرار شما</p>
+                        </div>
+                        <div class="faq-container">
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <h3>
+                                        چگونه می‌توانم سفارش خود را پیگیری کنم؟
+                                    </h3>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>
+                                        شما می‌توانید با وارد کردن شماره سفارش
+                                        در بخش "پیگیری سفارش" در پنل کاربری خود،
+                                        وضعیت سفارش را مشاهده کنید.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <h3>آیا امکان بازگشت کالا وجود دارد؟</h3>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>
+                                        بله، طبق قوانین جمهوری اسلامی ایران،
+                                        امکان بازگشت کالا تا ۷ روز پس از تحویل
+                                        وجود دارد.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <h3>هزینه ارسال چقدر است؟</h3>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>
+                                        برای سفارش‌های بالای ۵۰۰ هزار تومان،
+                                        ارسال رایگان است. در غیر این صورت، هزینه
+                                        ارسال ۳۰ هزار تومان می‌باشد.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <h3>آیا امکان پرداخت در محل وجود دارد؟</h3>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>
+                                        بله، امکان پرداخت در محل برای تمام
+                                        سفارش‌ها وجود دارد و هیچ هزینه اضافه‌ای
+                                        دریافت نمی‌شود.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Map Section -->
+                <section class="map-section">
+                    <div class="container">
+                        <div class="section-header">
+                            <h2>موقعیت ما</h2>
+                            <p>دفتر مرکزی شرکت در مرکز تبریز</p>
+                        </div>
+                        <div class="map-container">
+                            <div class="map-placeholder">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <h3>تبریز، خیابان آبرسان</h3>
+                                <p>پلاک ۱۲۳، طبقه ۲، واحد ۵</p>
+                                <div class="map-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span
+                                            >شنبه تا چهارشنبه: ۸ صبح تا ۶
+                                            عصر</span
+                                        >
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-phone"></i>
+                                        <span>۰۲۱-۱۲۳۴۵۶۷۸</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>info@store.com</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Social Media Section -->
+                <section class="social-section">
+                    <div class="container">
+                        <div class="section-header">
+                            <h2>شبکه‌های اجتماعی</h2>
+                            <p>ما را در شبکه‌های اجتماعی دنبال کنید</p>
+                        </div>
+                        <div class="social-links">
+                            <a href="#" class="social-link instagram">
+                                <i class="fab fa-instagram"></i>
+                                <span>اینستاگرام</span>
+                            </a>
+                            <a href="#" class="social-link telegram">
+                                <i class="fab fa-telegram"></i>
+                                <span>تلگرام</span>
+                            </a>
+                            <a href="#" class="social-link whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>واتساپ</span>
+                            </a>
+                            <a href="#" class="social-link linkedin">
+                                <i class="fab fa-linkedin"></i>
+                                <span>لینکدین</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Footer Placeholder -->
+            <div id="footer-placeholder"></div>
+        </div>
+
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/contact.js"></script>
+    </body>
+</html>

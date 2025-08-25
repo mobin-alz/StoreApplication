@@ -80,6 +80,7 @@ function showFieldError(fieldId, message) {
     field.parentNode.appendChild(errorDiv);
     field.style.borderColor = "#dc3545";
 }
+
 // Clear all errors
 function clearErrors() {
     const errors = document.querySelectorAll(".field-error");
@@ -90,6 +91,7 @@ function clearErrors() {
         field.style.borderColor = "#ddd";
     });
 }
+
 // Handle form submission
 document.addEventListener("DOMContentLoaded", function () {
     const registerForm = document.getElementById("registerForm");
@@ -115,6 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 role: document.getElementById("role").value,
             };
 
+            // Use regular fetch for register (no token needed)
             const response = await fetch("/auth/register", {
                 method: "POST",
                 headers: {
@@ -123,11 +126,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify(formData),
             });
 
-            const data = await response.json();
+            if (response && response.ok) {
+                const data = await response.json();
 
-            if (response.ok) {
+                // Store token and user info
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("username", data.username);
+                localStorage.setItem("userId", data.id);
+                localStorage.setItem("roles", JSON.stringify(data.roles));
+
                 showMessage(
-                    "ثبت‌نام موفقیت‌آمیز بود! در حال انتقال به داشبورد...",
+                    "ثبت‌ نام موفقیت‌آمیز بود! در حال انتقال به داشبورد...",
                     "success"
                 );
 
@@ -136,7 +145,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     window.location.href = "/dashboard";
                 }, 2000);
             } else {
-                showMessage(data.message || "خطا در ثبت‌نام", "error");
+                const data = await response.json();
+                showMessage(data.message || "خطا در ثبت‌ نام", "error");
             }
         } catch (error) {
             console.error("Error:", error);
