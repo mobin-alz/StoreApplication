@@ -43,18 +43,30 @@
                                 <i class="fas fa-shopping-cart"></i>
                                 <span>سبد خرید</span>
                             </div>
-                            <div class="placeholder-item">
+                            <div
+                                class="placeholder-item"
+                                id="wishlist-dashboard-btn"
+                                style="cursor: pointer"
+                            >
                                 <i class="fas fa-heart"></i>
                                 <span>علاقه‌مندی‌ها</span>
+                                <small
+                                    style="
+                                        color: #a8edea;
+                                        font-size: 0.8rem;
+                                        margin-top: 0.25rem;
+                                    "
+                                >
+                                </small>
                             </div>
                             <div class="placeholder-item">
                                 <i class="fas fa-box"></i>
                                 <span>سفارشات</span>
                             </div>
-                            <div class="placeholder-item">
+                            <!-- <div class="placeholder-item">
                                 <i class="fas fa-user-edit"></i>
                                 <span>پروفایل</span>
-                            </div>
+                            </div> -->
                         </div>
 
                         <!-- Provider Only Section -->
@@ -74,6 +86,55 @@
                                 >
                                     <i class="fas fa-box"></i>
                                     مدیریت محصولات
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Admin Only Section -->
+                        <div class="admin-only" style="display: none">
+                            <div class="dashboard-actions">
+                                <h3>مدیریت سیستم</h3>
+                                <a
+                                    href="/dashboard/category"
+                                    class="dashboard-action-link admin-link"
+                                >
+                                    <i class="fas fa-tags"></i>
+                                    مدیریت دسته‌بندی‌ها
+                                </a>
+                                <a
+                                    href="/dashboard/products"
+                                    class="dashboard-action-link admin-link"
+                                >
+                                    <i class="fas fa-box"></i>
+                                    مدیریت محصولات
+                                </a>
+                                <a
+                                    href="/dashboard/users"
+                                    class="dashboard-action-link admin-link"
+                                >
+                                    <i class="fas fa-users"></i>
+                                    مدیریت کاربران
+                                </a>
+                                <a
+                                    href="/dashboard/orders"
+                                    class="dashboard-action-link admin-link"
+                                >
+                                    <i class="fas fa-shopping-bag"></i>
+                                    مدیریت سفارشات
+                                </a>
+                                <a
+                                    href="/dashboard/analytics"
+                                    class="dashboard-action-link admin-link"
+                                >
+                                    <i class="fas fa-chart-line"></i>
+                                    گزارشات و آمار
+                                </a>
+                                <a
+                                    href="/dashboard/settings"
+                                    class="dashboard-action-link admin-link"
+                                >
+                                    <i class="fas fa-cog"></i>
+                                    تنظیمات سیستم
                                 </a>
                             </div>
                         </div>

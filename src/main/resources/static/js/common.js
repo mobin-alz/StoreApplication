@@ -65,8 +65,29 @@ function updateNavigationState() {
                             ? "مدیر"
                             : "کاربر";
                     if (dropdownRole) dropdownRole.textContent = roleText;
+
+                    // Show/hide wishlist navigation item based on role
+                    const wishlistNavItem =
+                        document.getElementById("wishlist-nav-item");
+                    if (wishlistNavItem) {
+                        const hasRequiredRole = rolesArray.some(
+                            (role) =>
+                                role.authority === "USER" ||
+                                role.authority === "PROVIDER"
+                        );
+                        wishlistNavItem.style.display = hasRequiredRole
+                            ? "block"
+                            : "none";
+                    }
                 } catch (e) {
                     if (dropdownRole) dropdownRole.textContent = "کاربر عادی";
+
+                    // Hide wishlist item if roles can't be parsed
+                    const wishlistNavItem =
+                        document.getElementById("wishlist-nav-item");
+                    if (wishlistNavItem) {
+                        wishlistNavItem.style.display = "none";
+                    }
                 }
             }
         }
@@ -74,6 +95,12 @@ function updateNavigationState() {
         // User is not logged in
         if (guestButtons) guestButtons.style.display = "flex";
         if (userDropdown) userDropdown.style.display = "none";
+
+        // Hide wishlist item for guests
+        const wishlistNavItem = document.getElementById("wishlist-nav-item");
+        if (wishlistNavItem) {
+            wishlistNavItem.style.display = "none";
+        }
     }
 }
 

@@ -90,6 +90,14 @@ async function multipartApiRequest(url, options = {}) {
     }
 }
 
+// Helper function to extract filename from full path (handles both Windows and Unix separators)
+function extractFilename(filePath) {
+    if (!filePath) return null;
+    // Handle both Windows (\) and Unix (/) path separators
+    const filename = filePath.split(/[\\\/]/).pop();
+    return filename;
+}
+
 // Example usage functions
 async function getWishList() {
     const userId = localStorage.getItem("userId");

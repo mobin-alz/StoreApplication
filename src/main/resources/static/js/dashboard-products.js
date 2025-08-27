@@ -1,5 +1,7 @@
 // Dashboard Products Management JavaScript
 let allProducts = [];
+let currentPage = 1;
+const productsPerPage = 12;
 let categories = [];
 
 // Check if user is logged in and has provider/admin role
@@ -173,7 +175,7 @@ async function loadProducts() {
     }
 }
 
-// Display products in grid
+// Display products in grid with pagination
 function displayProducts() {
     const grid = document.getElementById("products-grid");
     const countElement = document.getElementById("product-count");
@@ -184,17 +186,23 @@ function displayProducts() {
     if (allProducts.length === 0) {
         grid.innerHTML = "";
         document.getElementById("no-products").style.display = "block";
+        document.getElementById("pagination").style.display = "none";
         return;
     }
 
     document.getElementById("no-products").style.display = "none";
+    document.getElementById("pagination").style.display = "block";
 
-    grid.innerHTML = allProducts
+    // Calculate pagination
+    const startIndex = (currentPage - 1) * productsPerPage;
+    const endIndex = startIndex + productsPerPage;
+    const currentProducts = allProducts.slice(startIndex, endIndex);
+
+    grid.innerHTML = currentProducts
         .map((product) => createProductCard(product))
         .join("");
 }
 
-// Create product card HTML
 function createProductCard(product) {
     const hasDiscount = product.productDiscount && product.productDiscount > 0;
     const discountedPrice = hasDiscount
@@ -203,15 +211,22 @@ function createProductCard(product) {
         : product.productPrice;
 
     const imagePath = product.productImages
-        ? `/api/products/images/${product.productImages.split("/").pop()}`
+        ? `/api/products/images/${extractFilename(product.productImages)}`
         : null;
+
+    // Escape product name for HTML attributes
+    const safeName = product.productName
+        ? product.productName.replace(/"/g, "&quot;")
+        : "بدون نام";
 
     return `
         <div class="product-card" data-id="${product.productId}">
             <div class="product-image">
                 ${
                     imagePath
-                        ? `<img src="${imagePath}" alt="${product.productName}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\"><i class=\\"fas fa-image\\"></i></div>'">`
+                        ? `<img src="${imagePath}" 
+                                 alt="${safeName}" 
+                                 onerror="this.onerror=null; this.style.display='none'; this.insertAdjacentHTML('afterend','<div class=&quot;no-image&quot;><i class=&quot;fas fa-image&quot;></i></div>')">`
                         : `<div class="no-image"><i class="fas fa-image"></i></div>`
                 }
                 ${
@@ -221,34 +236,7 @@ function createProductCard(product) {
                 }
             </div>
             <div class="product-info">
-                <div class="product-category">${
-                    product.category?.name || "بدون دسته‌بندی"
-                }</div>
-                <h3 class="product-title">${product.productName}</h3>
-                <p class="product-description">${product.productDescription}</p>
-                
-                <div class="product-price-section">
-                    <span class="product-price">${formatPrice(
-                        discountedPrice
-                    )} تومان</span>
-                    ${
-                        hasDiscount
-                            ? `<span class="product-original-price">${formatPrice(
-                                  product.productPrice
-                              )} تومان</span>`
-                            : ""
-                    }
-                    ${
-                        hasDiscount
-                            ? `<span class="product-discount">${product.productDiscount}%</span>`
-                            : ""
-                    }
-                </div>
-                
-                <div class="product-quantity">
-                    <i class="fas fa-boxes"></i>
-                    موجودی: ${product.productQuantity} عدد
-                </div>
+                <h3 class="product-title">${safeName}</h3>
                 
                 <div class="product-actions">
                     <button class="btn-sm btn-primary" onclick="editProduct(${
@@ -257,9 +245,10 @@ function createProductCard(product) {
                         <i class="fas fa-edit"></i>
                         ویرایش
                     </button>
-                    <button class="btn-sm btn-danger" onclick="showDeleteConfirmation(${
-                        product.productId
-                    }, '${product.productName}')">
+                    <button class="btn-sm btn-danger" 
+                            onclick="showDeleteConfirmation(${
+                                product.productId
+                            }, '${safeName}')">
                         <i class="fas fa-trash"></i>
                         حذف
                     </button>
@@ -268,7 +257,6 @@ function createProductCard(product) {
         </div>
     `;
 }
-
 // Format price with Persian numbers
 function formatPrice(price) {
     return new Intl.NumberFormat("fa-IR").format(Math.round(price));
@@ -294,8 +282,12 @@ function handleImageChange(e) {
     if (file) {
         const reader = new FileReader();
         reader.onload = function (e) {
-            document.getElementById("preview-image").src = e.target.result;
-            document.getElementById("image-preview").style.display = "block";
+            const previewImg = document.getElementById("preview-img");
+            const imagePreview = document.getElementById("image-preview");
+            if (previewImg && imagePreview) {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = "block";
+            }
         };
         reader.readAsDataURL(file);
     }
@@ -303,9 +295,13 @@ function handleImageChange(e) {
 
 // Remove image preview
 function removeImage() {
-    document.getElementById("product-image").value = "";
-    document.getElementById("image-preview").style.display = "none";
-    document.getElementById("preview-image").src = "";
+    const productImage = document.getElementById("product-image");
+    const imagePreview = document.getElementById("image-preview");
+    const previewImg = document.getElementById("preview-img");
+
+    if (productImage) productImage.value = "";
+    if (imagePreview) imagePreview.style.display = "none";
+    if (previewImg) previewImg.src = "";
 }
 
 // Handle create form submission
@@ -476,6 +472,11 @@ function cancelCreate() {
     resetCreateForm();
 }
 
+// Cancel form (alias for cancelCreate)
+function cancelForm() {
+    cancelCreate();
+}
+
 // Clear form errors
 function clearErrors() {
     const errorElements = document.querySelectorAll(".field-error");
@@ -581,10 +582,11 @@ function showEditModal(product) {
 
     // Show current image if exists
     if (product.productImages) {
-        const imagePath = `/api/products/images/${product.productImages
-            .split("/")
-            .pop()}`;
+        const imagePath = `/api/products/images/${extractFilename(
+            product.productImages
+        )}`;
         document.getElementById("editPreviewImg").src = imagePath;
+        document.getElementById("editPreviewImg").style.display = "block";
         document.getElementById("editImagePreview").style.display = "block";
     } else {
         document.getElementById("editImagePreview").style.display = "none";
@@ -656,23 +658,28 @@ function handleEditImageChange(e) {
     const file = e.target.files[0];
     const preview = document.getElementById("editImagePreview");
 
-    if (file) {
+    if (file && preview) {
         const reader = new FileReader();
         reader.onload = function (e) {
             const previewImg = document.getElementById("editPreviewImg");
-            previewImg.src = e.target.result;
-            preview.style.display = "block";
+            if (previewImg) {
+                previewImg.src = e.target.result;
+                preview.style.display = "block";
+            }
         };
         reader.readAsDataURL(file);
-    } else {
+    } else if (preview) {
         preview.style.display = "none";
     }
 }
 
 // Remove image from edit form
 function removeEditImage() {
-    document.getElementById("editProductImage").value = "";
-    document.getElementById("editImagePreview").style.display = "none";
+    const editProductImage = document.getElementById("editProductImage");
+    const editImagePreview = document.getElementById("editImagePreview");
+
+    if (editProductImage) editProductImage.value = "";
+    if (editImagePreview) editImagePreview.style.display = "none";
 }
 
 // Handle edit form submission
@@ -1075,4 +1082,71 @@ function validateEditForm() {
     }
 
     return isValid;
+}
+
+// Pagination functions
+function updatePagination() {
+    const totalPages = Math.ceil(allProducts.length / productsPerPage);
+    const paginationContainer = document.getElementById("pagination");
+
+    if (totalPages <= 1) {
+        paginationContainer.style.display = "none";
+        return;
+    }
+
+    paginationContainer.style.display = "flex";
+
+    let paginationHTML = `
+        <button class="pagination-btn" onclick="changePage(${
+            currentPage - 1
+        })" ${currentPage === 1 ? "disabled" : ""}>
+            <i class="fas fa-chevron-right"></i>
+            قبلی
+        </button>
+        
+        <div class="page-numbers">`;
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (
+            i === 1 ||
+            i === totalPages ||
+            (i >= currentPage - 2 && i <= currentPage + 2)
+        ) {
+            paginationHTML += `
+                <button class="page-number ${
+                    i === currentPage ? "active" : ""
+                }" onclick="changePage(${i})">
+                    ${i}
+                </button>`;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+            paginationHTML += `<span class="page-ellipsis">...</span>`;
+        }
+    }
+
+    paginationHTML += `
+        </div>
+        
+        <button class="pagination-btn" onclick="changePage(${
+            currentPage + 1
+        })" ${currentPage === totalPages ? "disabled" : ""}>
+            بعدی
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    `;
+
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+function changePage(page) {
+    const totalPages = Math.ceil(allProducts.length / productsPerPage);
+    if (page < 1 || page > totalPages) return;
+
+    currentPage = page;
+    displayProducts();
+    updatePagination();
+
+    // Scroll to top of products section
+    document
+        .getElementById("products-management-section")
+        .scrollIntoView({ behavior: "smooth" });
 }

@@ -7,7 +7,86 @@ document.addEventListener("DOMContentLoaded", function () {
             updateAuthUI(true);
         }, 100);
     }
+
+    // Load real products for the main page
+    loadMainPageProducts();
 });
+
+// Load real products for the main page
+async function loadMainPageProducts() {
+    try {
+        const response = await apiRequest("/api/products");
+        if (response && response.ok) {
+            const products = await response.json();
+            displayMainPageProducts(products.slice(0, 6)); // Show first 6 products
+        }
+    } catch (error) {
+        console.error("Error loading main page products:", error);
+    }
+}
+
+// Display products on the main page
+function displayMainPageProducts(products) {
+    const productsGrid = document.querySelector(".products-grid");
+    if (!productsGrid) return;
+
+    productsGrid.innerHTML = "";
+
+    products.forEach((product) => {
+        const productCard = createMainPageProductCard(product);
+        productsGrid.appendChild(productCard);
+    });
+}
+
+// Create product card for main page
+function createMainPageProductCard(product) {
+    const productCard = document.createElement("div");
+    productCard.className = "product-card";
+
+    const imagePath = product.productImages
+        ? `/api/products/images/${extractFilename(product.productImages)}`
+        : "https://via.placeholder.com/300x200/cccccc/666666?text=بدون+تصویر";
+
+    const hasDiscount = product.productDiscount && product.productDiscount > 0;
+    const discountedPrice = hasDiscount
+        ? product.productPrice -
+          (product.productPrice * product.productDiscount) / 100
+        : product.productPrice;
+
+    productCard.innerHTML = `
+        <div class="product-image">
+            <img src="${imagePath}" alt="${product.productName}" />
+            ${
+                hasDiscount
+                    ? `<div class="product-badge">${product.productDiscount}% تخفیف</div>`
+                    : ""
+            }
+        </div>
+        <div class="product-info">
+            <h3>${product.productName}</h3>
+            <p class="price">
+                ${
+                    hasDiscount
+                        ? `<span class="original-price">${formatPrice(
+                              product.productPrice
+                          )} تومان</span>`
+                        : ""
+                }
+                ${formatPrice(discountedPrice)} تومان
+            </p>
+            <a href="/products/${product.productId}" class="btn btn-secondary">
+                مشاهده محصول
+            </a>
+        </div>
+    `;
+
+    return productCard;
+}
+
+// Format price with Persian numbers
+function formatPrice(price) {
+    return new Intl.NumberFormat("fa-IR").format(Math.round(price));
+}
 
 // Show message to user
 function showMessage(message, type) {

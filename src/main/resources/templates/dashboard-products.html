@@ -49,20 +49,21 @@
                         </div>
                     </div>
 
-                    <!-- Create Product Section -->
+                    <!-- Create/Edit Product Section -->
                     <div
                         class="create-product-section"
                         id="create-product-section"
                         style="display: none"
                     >
                         <div class="section-header">
-                            <h3>
+                            <h3 id="form-title">
                                 <i class="fas fa-plus-circle"></i>
                                 ایجاد کالا جدید
                             </h3>
                         </div>
 
                         <form id="create-product-form" class="product-form">
+                            <input type="hidden" id="product-id" />
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="product-name">
@@ -145,7 +146,8 @@
                                 <div class="form-group">
                                     <label for="product-quantity">
                                         <i class="fas fa-boxes"></i>
-                                        موجودی <span class="required">*</span>
+                                        موجودی
+                                        <span class="required">*</span>
                                     </label>
                                     <input
                                         type="number"
@@ -160,7 +162,7 @@
                             <div class="form-group">
                                 <label for="product-image">
                                     <i class="fas fa-image"></i>
-                                    تصویر محصول <span class="required">*</span>
+                                    تصویر محصول (اختیاری)
                                 </label>
                                 <div class="file-upload-wrapper">
                                     <input
@@ -168,14 +170,13 @@
                                         id="product-image"
                                         class="file-input enhanced"
                                         accept="image/*"
-                                        required
                                     />
                                     <label
                                         for="product-image"
                                         class="file-upload-label"
                                     >
                                         <i class="fas fa-cloud-upload-alt"></i>
-                                        <span>برای انتخاب تصویر کلیک کنید</span>
+                                        <span>برای آپلود تصویر کلیک کنید</span>
                                     </label>
                                 </div>
                                 <div
@@ -184,7 +185,7 @@
                                     style="display: none"
                                 >
                                     <img
-                                        id="preview-image"
+                                        id="preview-img"
                                         src=""
                                         alt="Preview"
                                     />
@@ -202,6 +203,7 @@
                                 <button
                                     type="submit"
                                     class="btn-enhanced btn-primary"
+                                    id="submit-btn"
                                 >
                                     <i class="fas fa-save"></i>
                                     ایجاد کالا
@@ -243,6 +245,15 @@
                         <!-- Products Grid -->
                         <div class="products-grid" id="products-grid">
                             <!-- Products will be loaded here -->
+                        </div>
+
+                        <!-- Pagination -->
+                        <div
+                            id="pagination"
+                            class="pagination"
+                            style="display: none"
+                        >
+                            <!-- Pagination will be generated here -->
                         </div>
 
                         <!-- Loading State -->
@@ -294,12 +305,12 @@
                 <div class="modal-body">
                     <form id="editForm" class="product-form">
                         <input type="hidden" id="editProductId" />
-
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="editProductName">
                                     <i class="fas fa-tag"></i>
-                                    نام کالا <span class="required">*</span>
+                                    نام محصول
+                                    <span class="required">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -312,7 +323,8 @@
                             <div class="form-group">
                                 <label for="editProductCategory">
                                     <i class="fas fa-folder"></i>
-                                    دسته‌بندی <span class="required">*</span>
+                                    دسته‌بندی
+                                    <span class="required">*</span>
                                 </label>
                                 <select
                                     id="editProductCategory"
@@ -327,7 +339,8 @@
                         <div class="form-group">
                             <label for="editProductDescription">
                                 <i class="fas fa-align-left"></i>
-                                توضیحات کالا <span class="required">*</span>
+                                توضیحات محصول
+                                <span class="required">*</span>
                             </label>
                             <textarea
                                 id="editProductDescription"
@@ -341,7 +354,8 @@
                             <div class="form-group">
                                 <label for="editProductPrice">
                                     <i class="fas fa-dollar-sign"></i>
-                                    قیمت (تومان) <span class="required">*</span>
+                                    قیمت (تومان)
+                                    <span class="required">*</span>
                                 </label>
                                 <input
                                     type="number"
@@ -356,7 +370,7 @@
                             <div class="form-group">
                                 <label for="editProductDiscount">
                                     <i class="fas fa-percentage"></i>
-                                    درصد تخفیف
+                                    تخفیف (درصد)
                                 </label>
                                 <input
                                     type="number"
@@ -367,11 +381,14 @@
                                     step="1"
                                 />
                             </div>
+                        </div>
 
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="editProductQuantity">
                                     <i class="fas fa-boxes"></i>
-                                    موجودی <span class="required">*</span>
+                                    تعداد موجودی
+                                    <span class="required">*</span>
                                 </label>
                                 <input
                                     type="number"
@@ -381,42 +398,45 @@
                                     required
                                 />
                             </div>
+
+                            <div class="form-group">
+                                <label for="editProductImage">
+                                    <i class="fas fa-image"></i>
+                                    تصویر محصول
+                                </label>
+                                <div class="file-upload-wrapper">
+                                    <input
+                                        type="file"
+                                        id="editProductImage"
+                                        accept="image/*"
+                                        class="file-input enhanced"
+                                    />
+                                    <label
+                                        for="editProductImage"
+                                        class="file-upload-label"
+                                    >
+                                        <i class="fas fa-upload"></i>
+                                        <span>انتخاب تصویر جدید</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="editProductImage">
-                                <i class="fas fa-image"></i>
-                                تصویر کالا (اختیاری)
-                            </label>
-                            <div class="file-upload-wrapper">
-                                <input
-                                    type="file"
-                                    id="editProductImage"
-                                    class="file-input enhanced"
-                                    accept="image/*"
-                                />
-                                <label
-                                    for="editProductImage"
-                                    class="file-upload-label"
-                                >
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <span>برای تغییر تصویر کلیک کنید</span>
-                                </label>
-                            </div>
-                            <div
-                                id="editImagePreview"
-                                class="file-preview"
-                                style="display: none"
+                        <!-- Image Preview for Edit -->
+                        <div
+                            id="editImagePreview"
+                            class="file-preview"
+                            style="display: none"
+                        >
+                            <img id="editPreviewImg" src="" alt="تصویر محصول" />
+                            <button
+                                type="button"
+                                class="remove-image"
+                                onclick="removeEditImage()"
+                                title="حذف تصویر"
                             >
-                                <img id="editPreviewImg" src="" alt="Preview" />
-                                <button
-                                    type="button"
-                                    class="remove-image"
-                                    onclick="removeEditImage()"
-                                >
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
 
                         <div class="form-actions">
@@ -442,11 +462,7 @@
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div
-            class="modal confirmation-modal"
-            id="confirmModal"
-            style="display: none"
-        >
+        <div class="confirmation-modal" id="confirmModal" style="display: none">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>

@@ -46,7 +46,7 @@ function displayCategories() {
 // Create category card HTML
 function createCategoryCard(category) {
     const imagePath = category.categoryImage
-        ? `/api/categories/images/${category.categoryImage.split("/").pop()}`
+        ? `/api/categories/images/${extractFilename(category.categoryImage)}`
         : null;
 
     return `
@@ -68,19 +68,7 @@ function createCategoryCard(category) {
             </div>
             <div class="category-info">
                 <h3>${category.name}</h3>
-                <p class="category-description">
-                    ${category.description || "دسته‌بندی محصولات فروشگاه"}
-                </p>
-                <div class="category-stats">
-                    <div class="category-stat">
-                        <span class="stat-number">${getRandomProductCount()}</span>
-                        <span class="stat-label">محصول</span>
-                    </div>
-                    <div class="category-stat">
-                        <span class="stat-number">${getRandomDiscount()}</span>
-                        <span class="stat-label">تخفیف</span>
-                    </div>
-                </div>
+               
             </div>
         </div>
     `;

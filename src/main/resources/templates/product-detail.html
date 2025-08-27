@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>جزئیات محصول - فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/product-detail.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="nav-placeholder"></div>
+
+        <main class="main-content">
+            <div class="container">
+                <div class="product-detail-page">
+                    <!-- Breadcrumb -->
+                    <nav class="breadcrumb">
+                        <a href="/" class="breadcrumb-link">خانه</a>
+                        <i class="fas fa-chevron-left"></i>
+                        <a href="/products" class="breadcrumb-link">محصولات</a>
+                        <i class="fas fa-chevron-left"></i>
+                        <span
+                            class="breadcrumb-current"
+                            id="product-name-breadcrumb"
+                            >محصول</span
+                        >
+                    </nav>
+
+                    <!-- Product Detail Section -->
+                    <div class="product-detail-section">
+                        <!-- Loading State -->
+                        <div id="loading-state" class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>در حال بارگذاری اطلاعات محصول...</p>
+                        </div>
+
+                        <!-- Product Content -->
+                        <div
+                            id="product-content"
+                            class="product-content"
+                            style="display: none"
+                        >
+                            <div class="product-images">
+                                <div class="main-image-container">
+                                    <img
+                                        id="main-image"
+                                        class="main-image"
+                                        src=""
+                                        alt=""
+                                    />
+                                    <div class="image-overlay">
+                                        <button
+                                            class="zoom-btn"
+                                            onclick="zoomImage()"
+                                        >
+                                            <i class="fas fa-search-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    class="thumbnail-images"
+                                    id="thumbnail-images"
+                                >
+                                    <!-- Thumbnails will be loaded here -->
+                                </div>
+                            </div>
+
+                            <div class="product-info">
+                                <div class="product-header">
+                                    <div
+                                        class="product-category"
+                                        id="product-category"
+                                    >
+                                        <!-- Category will be loaded here -->
+                                    </div>
+                                    <h1
+                                        class="product-title"
+                                        id="product-title"
+                                    >
+                                        <!-- Title will be loaded here -->
+                                    </h1>
+                                </div>
+
+                                <div class="product-price-section">
+                                    <div class="price-container">
+                                        <span class="current-price" id="current-price">
+                                            <!-- Price will be loaded here -->
+                                        </span>
+                                        <span class="original-price" id="original-price" style="display: none;">
+                                            <!-- Original price will be loaded here -->
+                                        </span>
+                                        <span class="discount-badge" id="discount-badge" style="display: none;">
+                                            <!-- Discount will be loaded here -->
+                                        </span>
+                                    </div>
+                                    <div class="price-note">
+                                        قیمت‌ها شامل مالیات و عوارض می‌باشد
+                                    </div>
+                                </div>
+
+                                <div class="product-options">
+                                    <div class="quantity-selector">
+                                        <label for="quantity">تعداد:</label>
+                                        <div class="quantity-controls">
+                                            <button class="quantity-btn" onclick="decreaseQuantity()">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" id="quantity" value="1" min="1" max="99">
+                                            <button class="quantity-btn" onclick="increaseQuantity()">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="stock-status" id="stock-status">
+                                        <!-- Stock status will be loaded here -->
+                                    </div>
+                                </div>
+
+                                <div class="product-actions">
+                                    <button
+                                        class="btn-add-cart"
+                                        id="add-to-cart-btn"
+                                        onclick="addToCart()"
+                                    >
+                                        <i class="fas fa-shopping-cart"></i>
+                                        افزودن به سبد خرید
+                                    </button>
+                                    <button
+                                        class="btn-wishlist"
+                                        onclick="addToWishlist()"
+                                    >
+                                        <i class="fas fa-heart"></i>
+                                        افزودن به علاقه‌مندی‌ها
+                                    </button>
+                                </div>
+
+                                <div class="product-features">
+                                    <div class="feature-item">
+                                        <i class="fas fa-shipping-fast"></i>
+                                        <span
+                                            >ارسال رایگان برای سفارشات بالای 500
+                                            هزار تومان</span
+                                        >
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-undo"></i>
+                                        <span
+                                            >بازگشت 7 روزه بدون قید و شرط</span
+                                        >
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>گارانتی اصالت کالا</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error State -->
+                        <div
+                            id="error-state"
+                            class="error-state"
+                            style="display: none"
+                        >
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>خطا در بارگذاری محصول</h3>
+                            <p>
+                                متأسفانه محصول مورد نظر یافت نشد یا خطایی در
+                                بارگذاری آن رخ داده است.
+                            </p>
+                            <a href="/products" class="btn-back"
+                                >بازگشت به لیست محصولات</a
+                            >
+                        </div>
+
+                    <!-- Product Details Tabs -->
+                    <div
+                        class="product-tabs"
+                        id="product-tabs"
+                        style="display: none"
+                    >
+                        <div class="tab-navigation">
+                            <button
+                                class="tab-btn active"
+                                data-tab="description"
+                            >
+                                <i class="fas fa-file-alt"></i>
+                                توضیحات
+                            </button>
+                            <button class="tab-btn" data-tab="specifications">
+                                <i class="fas fa-list"></i>
+                                مشخصات
+                            </button>
+                            <button class="tab-btn" data-tab="comments">
+                                <i class="fas fa-comments"></i>
+                                نظرات
+                                <span class="comments-count" id="comments-count">(0)</span>
+                            </button>
+                        </div>
+
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="description-tab">
+                                <div
+                                    class="description-content"
+                                    id="description-content"
+                                >
+                                    <!-- Description will be loaded here -->
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="specifications-tab">
+                                <div
+                                    class="specifications-content"
+                                    id="specifications-content"
+                                >
+                                    <!-- Specifications will be loaded here -->
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="comments-tab">
+                                <div class="comments-content">
+                                    <!-- Add Comment Form -->
+                                    <div class="add-comment-section">
+                                        <h3>افزودن نظر</h3>
+                                        <form id="comment-form" class="comment-form">
+                                            <div class="form-group">
+                                                <textarea
+                                                    id="comment-text"
+                                                    name="comment"
+                                                    placeholder="نظر خود را بنویسید..."
+                                                    required
+                                                ></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane"></i>
+                                                ارسال نظر
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Comments List -->
+                                    <div class="comments-list" id="comments-list">
+                                        <!-- Comments will be loaded here -->
+                                    </div>
+
+                                    <!-- No Comments State -->
+                                    <div id="no-comments" class="no-comments" style="display: none">
+                                        <i class="fas fa-comments"></i>
+                                        <h3>هنوز نظری ثبت نشده است</h3>
+                                        <p>اولین نفری باشید که نظر می‌دهد!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </main>
+
+        <!-- Zoom Modal -->
+        <div id="zoomModal" class="zoom-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>نمایش تصویر</h3>
+                    <button class="close-btn" onclick="closeZoomModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="zoomed-image" class="zoomed-image" src="" alt="">
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Comment Confirmation Modal -->
+        <div id="deleteCommentModal" class="confirmation-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-exclamation-triangle"></i> حذف نظر</h3>
+                </div>
+                <div class="modal-body">
+                    <p>آیا مطمئن هستید که می‌خواهید این نظر را حذف کنید؟</p>
+                    <p class="warning-text">این عملیات قابل بازگشت نیست.</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeDeleteCommentModal()">
+                        <i class="fas fa-times"></i>
+                        انصراف
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmDeleteComment()">
+                        <i class="fas fa-trash"></i>
+                        حذف
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer-placeholder"></div>
+
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/product-detail.js"></script>
+    </body>
+</html>

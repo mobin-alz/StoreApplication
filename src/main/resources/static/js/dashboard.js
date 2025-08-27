@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Start token expiration check
         setInterval(checkTokenExpiration, 60000); // Check every minute
+
+        // Add event listeners for dashboard items
+        addDashboardEventListeners();
     }, 100);
 });
 
@@ -73,5 +76,16 @@ async function loadUserData() {
     } catch (error) {
         console.error("Error loading user data:", error);
         showMessage("خطا در بارگذاری اطلاعات کاربر", "error");
+    }
+}
+
+// Add event listeners for dashboard items
+function addDashboardEventListeners() {
+    // Wishlist button
+    const wishlistBtn = document.getElementById("wishlist-dashboard-btn");
+    if (wishlistBtn) {
+        wishlistBtn.addEventListener("click", function () {
+            window.location.href = "/wishlist";
+        });
     }
 }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>لیست علاقه‌مندی‌ها - فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/wishlist.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="nav-placeholder"></div>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>
+                            <i class="fas fa-heart"></i>
+                            لیست علاقه‌مندی‌ها
+                        </h1>
+                        <p>محصولات مورد علاقه شما در یک مکان</p>
+                    </div>
+                </div>
+
+                <!-- Wishlist Content -->
+                <div class="wishlist-container">
+                    <!-- Loading State -->
+                    <div id="loading-state" class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>در حال بارگذاری علاقه‌مندی‌ها...</p>
+                    </div>
+
+                    <!-- Empty Wishlist State -->
+                    <div
+                        id="empty-wishlist"
+                        class="empty-wishlist"
+                        style="display: none"
+                    >
+                        <div class="empty-icon">
+                            <i class="fas fa-heart-broken"></i>
+                        </div>
+                        <h3>لیست علاقه‌مندی‌های شما خالی است</h3>
+                        <p>هنوز محصولی به علاقه‌مندی‌های خود اضافه نکرده‌اید</p>
+                        <a href="/products" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag"></i>
+                            مشاهده محصولات
+                        </a>
+                    </div>
+
+                    <!-- Wishlist Grid -->
+                    <div
+                        id="wishlist-grid"
+                        class="wishlist-grid"
+                        style="display: none"
+                    >
+                        <!-- Wishlist items will be loaded here -->
+                    </div>
+
+                    <!-- Wishlist Actions -->
+                    <div
+                        id="wishlist-actions"
+                        class="wishlist-actions"
+                        style="display: none"
+                    >
+                        <button
+                            class="btn btn-danger"
+                            onclick="clearWishlist()"
+                        >
+                            <i class="fas fa-trash"></i>
+                            پاک کردن همه
+                        </button>
+                        <a href="/products" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            بازگشت به محصولات
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="footer-placeholder"></div>
+
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/wishlist.js"></script>
+    </body>
+</html>
+

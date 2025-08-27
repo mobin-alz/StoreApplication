@@ -1,6 +1,13 @@
 /* Dashboard Products Management Styles */
 .dashboard-products {
     padding: 2rem 0;
+    position: relative;
+    z-index: 100; /* Ensure content is above background */
+}
+
+/* Override conflicting main-content::before from other CSS files */
+.dashboard-products .main-content::before {
+    display: none !important;
 }
 
 /* Page Header */
@@ -9,11 +16,12 @@
     margin-bottom: 3rem;
     padding: 3rem 0;
     background: linear-gradient(135deg, rgb(32 195 183), rgb(12 161 150));
-
     border-radius: 24px;
     border: 2px solid rgba(168, 237, 234, 0.3);
     box-shadow: 0 8px 32px rgba(168, 237, 234, 0.1);
     backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 150; /* Higher than background */
 }
 
 /* .header-content h1 {
@@ -58,7 +66,7 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     backdrop-filter: blur(20px);
     position: relative;
-    z-index: 10;
+    z-index: 150; /* Higher than background */
 }
 
 .create-product-section::before {
@@ -146,7 +154,7 @@
     transition: all 0.3s ease;
     color: #374151;
     position: relative;
-    z-index: 5;
+    z-index: 200; /* Higher than other elements */
 }
 
 .enhanced-input:focus {
@@ -203,7 +211,7 @@
     width: 100%;
     height: 100%;
     cursor: pointer;
-    z-index: 10;
+    z-index: 250; /* Higher than other elements */
 }
 
 .file-upload-label {
@@ -291,8 +299,8 @@
     gap: 0.75rem;
     text-decoration: none;
     position: relative;
-    z-index: 10;
-    pointer-events: auto;
+    z-index: 300; /* Much higher than background */
+    pointer-events: auto !important; /* Force pointer events */
     user-select: none;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
@@ -300,6 +308,11 @@
 .btn-primary.btn-enhanced {
     background: linear-gradient(135deg, #4f46e5, #6366f1);
     color: white;
+}
+
+.btn-enhanced:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary.btn-enhanced:hover {
@@ -342,6 +355,8 @@
     padding: 2.5rem;
     border: 1px solid rgba(226, 232, 240, 0.6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    position: relative;
+    z-index: 150; /* Higher than background */
 }
 
 .products-management-section .section-header {
@@ -352,7 +367,7 @@
     padding-bottom: 1.5rem;
     border-bottom: 2px solid rgba(226, 232, 240, 0.6);
     position: relative;
-    z-index: 5;
+    z-index: 200; /* Higher than section */
 }
 
 .products-management-section .section-header .header-left {
@@ -389,8 +404,8 @@
 /* Products Grid */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
@@ -400,13 +415,15 @@
         rgba(255, 255, 255, 0.95) 0%,
         rgba(248, 250, 252, 0.95) 100%
     );
-    border-radius: 16px;
-    padding: 1.5rem;
+    border-radius: 12px;
+    padding: 1rem;
     border: 1px solid rgba(226, 232, 240, 0.6);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Allow buttons to be visible */
+    z-index: 200; /* Higher than section */
+    margin-bottom: 0.5rem; /* Reduced bottom margin */
 }
 
 .product-card::before {
@@ -427,10 +444,10 @@
 
 .product-image {
     position: relative;
-    margin-bottom: 1.5rem;
-    border-radius: 12px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
     overflow: hidden;
-    aspect-ratio: 16/9;
+    aspect-ratio: 4/3;
     background: #f8fafc;
     display: flex;
     align-items: center;
@@ -456,7 +473,8 @@
 .product-info {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
+    min-height: 160px; /* Reduced minimum height */
 }
 
 .product-category {
@@ -483,7 +501,7 @@
     line-height: 1.6;
     margin: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -531,14 +549,20 @@
     color: #a8edea;
 }
 
+/* Product Actions - Ensure buttons are properly positioned and clickable */
 .product-actions {
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid rgba(226, 232, 240, 0.4);
+    position: relative;
+    z-index: 250; /* Higher than card */
+    justify-content: center; /* Center the buttons */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
 }
 
+/* Button Styles - Ensure they're clickable */
 .btn-sm {
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
@@ -550,11 +574,31 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    position: relative;
+    z-index: 300; /* Much higher than background */
+    pointer-events: auto !important; /* Force pointer events */
+    min-width: 100px; /* Ensure minimum width */
+    justify-content: center; /* Center button content */
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.btn-sm:active {
+    transform: translateY(1px);
+}
+
+.btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .btn-sm.btn-primary {
     background: linear-gradient(135deg, #4f46e5, #6366f1);
     color: white;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
 .btn-sm.btn-primary:hover {
@@ -566,6 +610,7 @@
 .btn-sm.btn-danger {
     background: linear-gradient(135deg, #ef4444, #f87171);
     color: white;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .btn-sm.btn-danger:hover {
@@ -653,50 +698,429 @@
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.modal-header {
-    padding: 2rem 2rem 1.5rem;
-    border-bottom: 2px solid rgba(226, 232, 240, 0.4);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Specific styles for edit modal to override enhanced-modal conflicts */
+#editModal {
+    z-index: 2000 !important;
 }
 
-.modal-header h3 {
-    color: #1e293b;
-    margin: 0;
+#editModal .modal-content {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%
+    ) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
+    padding: 0 !important;
+    width: 90% !important;
+    max-width: 800px !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    max-height: 90vh !important;
+    overflow: hidden !important;
+}
+
+#editModal .modal-header {
+    background: linear-gradient(135deg, #a8edea, #fed6e3) !important;
+    padding: 2rem 2.5rem 1.5rem !important;
+    border-bottom: 1px solid rgba(168, 237, 234, 0.2) !important;
+    position: relative !important;
+    border-radius: 24px 24px 0 0 !important;
+}
+
+#editModal .modal-header::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg, #a8edea, #fed6e3, #ffecd2) !important;
+    background-size: 200% 100% !important;
+    animation: gradient-shift 3s ease infinite !important;
+    border-radius: 24px 24px 0 0 !important;
+}
+
+#editModal .modal-header h3 {
+    color: #2d3748 !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    justify-content: center !important;
+    flex: 1 !important;
+}
+
+#editModal .modal-header h3 i {
+    color: #a8edea !important;
+    font-size: 1.25rem !important;
+}
+
+#editModal .close-btn.enhanced {
+    position: absolute !important;
+    top: 1.5rem !important;
+    right: 2rem !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 1.2rem !important;
+    color: #718096 !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+#editModal .close-btn.enhanced:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    color: #e53e3e !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+#editModal .modal-body {
+    padding: 2rem !important;
+    max-height: calc(90vh - 200px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+#editModal .modal-body::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+#editModal .modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+    border-radius: 4px !important;
+}
+
+#editModal .modal-body::-webkit-scrollbar-thumb {
+    background: #a8edea !important;
+    border-radius: 4px !important;
+}
+
+#editModal .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #81e6d9 !important;
+}
+
+/* Ensure form elements in edit modal are properly styled */
+#editModal .product-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+}
+
+#editModal .form-row {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 2rem !important;
+}
+
+#editModal .form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+}
+
+#editModal .enhanced-input {
+    padding: 1rem 1.25rem !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-family: inherit !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    transition: all 0.3s ease !important;
+    color: #374151 !important;
+    position: relative !important;
+    z-index: 200 !important;
+}
+
+#editModal .enhanced-input:focus {
+    outline: none !important;
+    border-color: #a8edea !important;
+    box-shadow: 0 0 0 4px rgba(168, 237, 234, 0.15) !important;
+    background: rgba(255, 255, 255, 1) !important;
+    transform: translateY(-2px) !important;
+}
+
+#editModal .enhanced-input:hover {
+    border-color: #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+#editModal .form-actions {
+    display: flex !important;
+    gap: 1.5rem !important;
+    margin-top: 1rem !important;
+    padding-top: 2rem !important;
+    border-top: 2px solid rgba(226, 232, 240, 0.6) !important;
+    justify-content: center !important;
+}
+
+#editModal .btn-enhanced {
+    padding: 1rem 2rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    text-decoration: none !important;
+    position: relative !important;
+    z-index: 300 !important;
+    pointer-events: auto !important;
+    user-select: none !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+#editModal .btn-primary.btn-enhanced {
+    background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+    color: white !important;
+}
+
+#editModal .btn-enhanced:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+}
+
+#editModal .btn-primary.btn-enhanced:hover {
+    background: linear-gradient(135deg, #4338ca, #5855eb) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3) !important;
+}
+
+#editModal .btn-secondary.btn-enhanced {
+    background: linear-gradient(135deg, #6b7280, #9ca3af) !important;
+    color: white !important;
+}
+
+#editModal .btn-secondary.btn-enhanced:hover {
+    background: linear-gradient(135deg, #4b5563, #6b7280) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3) !important;
+}
+
+/* File upload styles for edit modal */
+#editModal .file-upload-wrapper {
+    position: relative !important;
+    margin-top: 0.5rem !important;
+}
+
+#editModal .file-input.enhanced {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    cursor: pointer !important;
+    z-index: 250 !important;
+}
+
+#editModal .file-upload-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    padding: 1.25rem 1.5rem !important;
+    border: 2px dashed #cbd5e1 !important;
+    border-radius: 12px !important;
+    background: rgba(248, 250, 252, 0.8) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+
+#editModal .file-upload-label:hover {
+    border-color: #a8edea !important;
+    background: rgba(248, 250, 252, 1) !important;
+    color: #4f46e5 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(168, 237, 234, 0.15) !important;
+}
+
+#editModal .file-upload-label i {
+    font-size: 1.25rem !important;
+    color: #a8edea !important;
+}
+
+#editModal .file-preview {
+    margin-top: 1.5rem !important;
+    text-align: center !important;
+    padding: 1.5rem !important;
+    background: rgba(248, 250, 252, 0.8) !important;
+    border-radius: 12px !important;
+    border: 2px solid rgba(226, 232, 240, 0.6) !important;
+}
+
+#editModal .file-preview img {
+    max-width: 250px !important;
+    max-height: 200px !important;
+    border-radius: 12px !important;
+    border: 2px solid #e2e8f0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+#editModal .remove-image {
+    margin-top: 1rem !important;
+    padding: 0.75rem 1.5rem !important;
+    background: #ef4444 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+#editModal .remove-image:hover {
+    background: #dc2626 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Confirmation Modal Styles - Matching categories page */
+.confirmation-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+}
+
+.confirmation-modal .modal-content {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(248, 250, 252, 0.98) 100%
+    );
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: slideInModal 0.3s ease;
+    border: 2px solid rgb(255 25 25);
+    overflow: hidden;
+}
+
+.confirmation-modal .modal-header {
+    background: linear-gradient(135deg, #fed7d7, #feb2b2);
+    padding: 2rem 2.5rem 1.5rem;
+    border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+    position: relative;
+}
+
+.confirmation-modal .modal-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #fed7d7, #feb2b2, #fc8181);
+    background-size: 200% 100%;
+    animation: gradient-shift 3s ease infinite;
+}
+
+.confirmation-modal .modal-header h3 {
+    color: #2d3748;
     font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+}
+
+.confirmation-modal .modal-header h3 i {
+    color: #e53e3e;
+    font-size: 1.25rem;
+}
+
+.confirmation-modal .modal-body {
+    padding: 2.5rem;
+}
+
+.confirmation-modal .modal-body p {
+    color: #4a5568;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.confirmation-modal .warning-text {
+    color: #e53e3e;
     font-weight: 600;
 }
 
-.close-btn.enhanced {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #94a3b8;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.close-btn.enhanced:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-}
-
-.modal-body {
-    padding: 2rem;
-}
-
-.modal-actions {
-    padding: 1.5rem 2rem 2rem;
-    border-top: 2px solid rgba(226, 232, 240, 0.4);
+.confirmation-modal .modal-actions {
     display: flex;
     gap: 1rem;
-    justify-content: flex-end;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.confirmation-modal .modal-actions .btn {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.confirmation-modal .modal-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.confirmation-modal .modal-actions .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+    color: white;
+}
+
+.confirmation-modal .modal-actions .btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.confirmation-modal .modal-actions .btn-secondary {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: white;
+}
+
+.confirmation-modal .modal-actions .btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563, #6b7280);
 }
 
 /* Responsive Design */
@@ -752,6 +1176,59 @@
     .modal-actions {
         padding: 1.5rem;
     }
+
+    /* Edit modal responsive styles */
+    #editModal .modal-content {
+        width: 95% !important;
+        max-width: 95vw !important;
+        max-height: 95vh !important;
+    }
+
+    #editModal .modal-header,
+    #editModal .modal-body {
+        padding: 1.5rem !important;
+    }
+
+    #editModal .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+
+    #editModal .form-actions {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    #editModal .btn-enhanced {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Confirmation modal responsive styles */
+    .confirmation-modal .modal-content {
+        width: 95% !important;
+        max-width: 95vw !important;
+        margin: 1rem !important;
+    }
+
+    .confirmation-modal .modal-header,
+    .confirmation-modal .modal-body {
+        padding: 1.5rem !important;
+    }
+
+    .confirmation-modal .modal-header h3 {
+        font-size: 1.3rem !important;
+    }
+
+    .confirmation-modal .modal-actions {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    .confirmation-modal .modal-actions .btn {
+        width: 100% !important;
+        min-width: auto !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -776,6 +1253,48 @@
     .btn-enhanced {
         padding: 0.875rem 1.5rem;
         font-size: 0.95rem;
+    }
+
+    /* Edit modal responsive styles for small screens */
+    #editModal .modal-content {
+        width: 98% !important;
+        max-width: 98vw !important;
+        margin: 0.5rem !important;
+        border-radius: 20px !important;
+    }
+
+    #editModal .modal-header,
+    #editModal .modal-body {
+        padding: 1.25rem !important;
+    }
+
+    #editModal .modal-header h3 {
+        font-size: 1.2rem !important;
+    }
+
+    #editModal .close-btn.enhanced {
+        top: 0.75rem !important;
+        right: 1.25rem !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1rem !important;
+    }
+
+    /* Confirmation modal responsive styles for small screens */
+    .confirmation-modal .modal-content {
+        width: 98% !important;
+        max-width: 98vw !important;
+        margin: 0.5rem !important;
+        border-radius: 20px !important;
+    }
+
+    .confirmation-modal .modal-header,
+    .confirmation-modal .modal-body {
+        padding: 1.25rem !important;
+    }
+
+    .confirmation-modal .modal-header h3 {
+        font-size: 1.2rem !important;
     }
 }
 
@@ -809,6 +1328,29 @@
     }
 }
 
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes slideInModal {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
 /* Apply animations */
 .create-product-section,
 .products-management-section,
@@ -827,4 +1369,235 @@
 }
 .product-card:nth-child(4) {
     animation-delay: 0.4s;
+}
+
+/* Admin-specific features */
+.admin-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+.admin-badge i {
+    color: #fbbf24;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.admin-btn:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #9333ea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-products {
+        padding: 1rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .header-content h1 {
+        font-size: 2rem;
+    }
+
+    .header-content h1 i {
+        font-size: 1.8rem;
+    }
+
+    .create-product-section,
+    .products-management-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .btn-enhanced {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-content {
+        margin: 1rem;
+        max-width: calc(100vw - 2rem);
+    }
+
+    .modal-header,
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .close-btn.enhanced {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .product-card {
+        padding: 0.75rem;
+    }
+
+    .product-image {
+        margin-bottom: 0.75rem;
+    }
+
+    .product-info {
+        min-height: 140px;
+        gap: 0.5rem;
+    }
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1rem;
+}
+
+.pagination-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.pagination-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.page-number {
+    background: white;
+    color: #667eea;
+    border: 2px solid #e2e8f0;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 45px;
+    text-align: center;
+}
+
+.page-number:hover {
+    border-color: #667eea;
+    background: #f8fafc;
+    transform: translateY(-2px);
+}
+
+.page-number.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.page-ellipsis {
+    color: #64748b;
+    font-weight: 600;
+    padding: 0.75rem 0.5rem;
+}
+
+/* Responsive pagination */
+@media (max-width: 768px) {
+    .pagination {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .page-numbers {
+        order: -1;
+    }
+
+    .pagination-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }

@@ -161,17 +161,34 @@
     border-radius: 12px;
     border: 1px solid rgba(226, 232, 240, 0.8);
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .placeholder-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(168, 237, 234, 0.6);
 }
 
 .placeholder-item i {
     font-size: 2rem;
     color: #a8edea;
+    transition: all 0.3s ease;
+}
+
+.placeholder-item:hover i {
+    transform: scale(1.1);
+    color: #81e6d9;
+}
+
+.placeholder-item small {
+    transition: all 0.3s ease;
+}
+
+.placeholder-item:hover small {
+    color: #4fd1c7 !important;
+    transform: translateX(-3px);
 }
 
 .placeholder-item span {

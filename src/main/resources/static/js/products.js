@@ -102,15 +102,22 @@ function createProductCard(product) {
         : product.productPrice;
 
     const imagePath = product.productImages
-        ? `/api/products/images/${product.productImages.split("/").pop()}`
+        ? `/api/products/images/${extractFilename(product.productImages)}`
         : null;
+
+    // Escape dangerous characters for alt text
+    const safeName = product.productName
+        ? product.productName.replace(/"/g, "&quot;")
+        : "بدون نام";
 
     return `
         <div class="product-card" data-id="${product.productId}">
             <div class="product-image">
                 ${
                     imagePath
-                        ? `<img src="${imagePath}" alt="${product.productName}" onerror="this.parentElement.innerHTML='<div class=\\"no-image\\"><i class=\\"fas fa-image\\"></i></div>'">`
+                        ? `<img src="${imagePath}" 
+                                 alt="${safeName}" 
+                                 onerror="this.onerror=null; this.style.display='none'; this.insertAdjacentHTML('afterend','<div class=&quot;no-image&quot;><i class=&quot;fas fa-image&quot;></i></div>')">`
                         : `<div class="no-image"><i class="fas fa-image"></i></div>`
                 }
                 ${
@@ -123,8 +130,10 @@ function createProductCard(product) {
                 <div class="product-category">${
                     product.category?.name || "بدون دسته‌بندی"
                 }</div>
-                <h3 class="product-title">${product.productName}</h3>
-                <p class="product-description">${product.productDescription}</p>
+                <h3 class="product-title">${safeName}</h3>
+                <p class="product-description">${
+                    product.productDescription || ""
+                }</p>
                 
                 <div class="product-price-section">
                     <span class="product-price">${formatPrice(
@@ -145,17 +154,12 @@ function createProductCard(product) {
                 </div>
                 
                 <div class="product-actions">
-                    <button class="btn-add-cart" onclick="addToCart(${
+                    <a href="/products/${
                         product.productId
-                    })">
-                        <i class="fas fa-shopping-cart"></i>
-                        افزودن به سبد
-                    </button>
-                    <button class="btn-quick-view" onclick="showQuickView(${
-                        product.productId
-                    })" title="نمایش سریع">
+                    }" class="btn-view-product">
                         <i class="fas fa-eye"></i>
-                    </button>
+                        مشاهده محصول
+                    </a>
                 </div>
             </div>
         </div>
@@ -315,174 +319,6 @@ function changePage(page) {
         .querySelector(".products-container")
         .scrollIntoView({ behavior: "smooth" });
 }
-
-// Add to cart functionality
-async function addToCart(productId) {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        showMessage("لطفاً ابتدا وارد شوید", "error");
-        setTimeout(() => {
-            window.location.href = "/login";
-        }, 2000);
-        return;
-    }
-
-    try {
-        // Get user ID from localStorage
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-            showMessage("خطا در شناسایی کاربر", "error");
-            return;
-        }
-
-        // First, get or create shopping cart
-        let cartResponse = await fetch(`/api/shopping-cart/${userId}`);
-        let cart;
-
-        if (cartResponse.status === 404) {
-            // Create new cart
-            const createCartResponse = await fetch("/api/shopping-cart", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ userId: parseInt(userId) }),
-            });
-
-            if (!createCartResponse.ok) {
-                throw new Error("Failed to create cart");
-            }
-
-            const cartData = await createCartResponse.json();
-            cart = { id: cartData.id };
-        } else if (cartResponse.ok) {
-            cart = await cartResponse.json();
-        } else {
-            throw new Error("Failed to get cart");
-        }
-
-        // Add product to cart
-        const addToCartResponse = await fetch("/api/cart-items", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                cartId: cart.id,
-                productId: productId,
-                quantity: 1,
-                price: 0, // Price will be set by backend
-            }),
-        });
-
-        if (addToCartResponse.ok) {
-            showMessage("محصول با موفقیت به سبد خرید اضافه شد", "success");
-        } else {
-            const errorData = await addToCartResponse.json();
-            showMessage(
-                errorData.message || "خطا در افزودن به سبد خرید",
-                "error"
-            );
-        }
-    } catch (error) {
-        console.error("Error adding to cart:", error);
-        showMessage("خطا در افزودن به سبد خرید", "error");
-    }
-}
-
-// Show quick view modal
-async function showQuickView(productId) {
-    try {
-        const response = await fetch(`/api/products/${productId}`);
-        if (response.ok) {
-            const product = await response.json();
-            displayQuickView(product);
-            document.getElementById("quickViewModal").style.display = "block";
-        } else {
-            showMessage("خطا در بارگذاری اطلاعات محصول", "error");
-        }
-    } catch (error) {
-        console.error("Error loading product details:", error);
-        showMessage("خطا در اتصال به سرور", "error");
-    }
-}
-
-// Display quick view content
-function displayQuickView(product) {
-    const content = document.getElementById("quickViewContent");
-    const hasDiscount = product.productDiscount && product.productDiscount > 0;
-    const discountedPrice = hasDiscount
-        ? product.productPrice -
-          (product.productPrice * product.productDiscount) / 100
-        : product.productPrice;
-
-    const imagePath = product.productImages
-        ? `/api/products/images/${product.productImages.split("/").pop()}`
-        : null;
-
-    content.innerHTML = `
-        <div class="quick-view-product">
-            <div class="product-image-large">
-                ${
-                    imagePath
-                        ? `<img src="${imagePath}" alt="${product.productName}" onerror="this.parentElement.innerHTML='<div class=\\"no-image-large\\"><i class=\\"fas fa-image\\"></i></div>'">`
-                        : `<div class="no-image-large"><i class="fas fa-image"></i></div>`
-                }
-            </div>
-            <div class="product-details">
-                <div class="product-category">${
-                    product.category?.name || "بدون دسته‌بندی"
-                }</div>
-                <h2 class="product-title-large">${product.productName}</h2>
-                <p class="product-description-large">${
-                    product.productDescription
-                }</p>
-                
-                <div class="product-price-section-large">
-                    <span class="product-price-large">${formatPrice(
-                        discountedPrice
-                    )} تومان</span>
-                    ${
-                        hasDiscount
-                            ? `<span class="product-original-price-large">${formatPrice(
-                                  product.productPrice
-                              )} تومان</span>`
-                            : ""
-                    }
-                    ${
-                        hasDiscount
-                            ? `<span class="product-discount-large">${product.productDiscount}% تخفیف</span>`
-                            : ""
-                    }
-                </div>
-                
-                <div class="product-actions-large">
-                    <button class="btn-add-cart-large" onclick="addToCart(${
-                        product.productId
-                    })">
-                        <i class="fas fa-shopping-cart"></i>
-                        افزودن به سبد خرید
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// Close quick view modal
-function closeQuickView() {
-    document.getElementById("quickViewModal").style.display = "none";
-}
-
-// Close modal when clicking outside
-document.addEventListener("click", function (event) {
-    const modal = document.getElementById("quickViewModal");
-    if (event.target === modal) {
-        closeQuickView();
-    }
-});
 
 // Show message function
 function showMessage(message, type) {

@@ -19,6 +19,11 @@ public class WebController {
         return "products";
     }
 
+    @GetMapping("/products/{id}")
+    public String productDetail() {
+        return "product-detail";
+    }
+
     @GetMapping("/login")
     public String login() {
         return "login";
@@ -47,6 +52,11 @@ public class WebController {
     @GetMapping("/dashboard/products")
     public String dashboardProducts() {
         return "dashboard-products";
+    }
+    
+    @GetMapping("/wishlist")
+    public String wishlist() {
+        return "wishlist";
     }
     
     @GetMapping("/about")
