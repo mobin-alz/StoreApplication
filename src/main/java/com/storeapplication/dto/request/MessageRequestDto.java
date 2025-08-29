@@ -9,7 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageRequestDto {
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private String title;
     private String message;
-    private String messageType;
-    private String cssClass;
 }

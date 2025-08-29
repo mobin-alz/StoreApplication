@@ -55,7 +55,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (!jwtUtil.isTokenValid(token)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid token");
         }
-        String userRole = jwtUtil.extractRoles(token).getFirst();
+        List<String> roles = jwtUtil.extractRoles(token);
+        String userRole = (roles != null && !roles.isEmpty()) ? roles.get(0) : null;
         if (userRole == null || !userRole.equalsIgnoreCase(requiredRole)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Insufficient permissions");
         }

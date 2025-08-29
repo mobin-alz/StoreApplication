@@ -89,7 +89,7 @@ public class AuthController {
             response.setSuccess(false);
 
         }else {
-            if (!request.getRole().equalsIgnoreCase("USER") && !request.getRole().equals("PROVIDER")){
+            if (!request.getRole().equalsIgnoreCase("USER") && !request.getRole().equals("PROVIDER") && !request.getRole().equalsIgnoreCase("ADMIN")){
 
                 response.setMessage("Invalid Role");
                 response.setSuccess(false);
