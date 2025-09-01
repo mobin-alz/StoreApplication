@@ -3,6 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
     loadNavigation();
     loadFooter();
     updateNavigationState();
+
+    // Update cart count if user is logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+        updateCartCount();
+    }
 });
 
 function loadNavigation() {
@@ -39,6 +45,7 @@ function updateNavigationState() {
 
     const guestButtons = document.getElementById("guest-buttons");
     const userDropdown = document.getElementById("user-dropdown");
+    const shoppingCartIcon = document.getElementById("shopping-cart-icon");
     const userName = document.getElementById("user-name");
     const dropdownUsername = document.getElementById("dropdown-username");
     const dropdownRole = document.getElementById("dropdown-role");
@@ -46,6 +53,22 @@ function updateNavigationState() {
     if (token && username) {
         // User is logged in
         if (guestButtons) guestButtons.style.display = "none";
+
+        // Check if user is admin to hide shopping cart
+        let isAdmin = false;
+        if (roles) {
+            try {
+                const rolesArray = JSON.parse(roles);
+                isAdmin = rolesArray.some((role) => role.authority === "ADMIN");
+            } catch (e) {
+                console.error("Error parsing roles:", e);
+            }
+        }
+
+        if (shoppingCartIcon) {
+            shoppingCartIcon.style.display = isAdmin ? "none" : "flex";
+        }
+
         if (userDropdown) {
             userDropdown.style.display = "flex";
             if (userName) userName.textContent = username;
@@ -94,6 +117,7 @@ function updateNavigationState() {
     } else {
         // User is not logged in
         if (guestButtons) guestButtons.style.display = "flex";
+        if (shoppingCartIcon) shoppingCartIcon.style.display = "none";
         if (userDropdown) userDropdown.style.display = "none";
 
         // Hide wishlist item for guests
@@ -274,6 +298,29 @@ function checkTokenExpiration() {
 
 // Make function globally accessible
 window.checkTokenExpiration = checkTokenExpiration;
+
+// Update cart count in navigation
+async function updateCartCount() {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!token || !userId) return;
+
+    try {
+        const cart = await getOrCreateShoppingCart(userId);
+        if (cart && cart.cartItems) {
+            const cartCount = document.getElementById("cart-count");
+            if (cartCount) {
+                cartCount.textContent = cart.cartItems.length;
+            }
+        }
+    } catch (error) {
+        console.error("Error updating cart count:", error);
+    }
+}
+
+// Make function globally accessible
+window.updateCartCount = updateCartCount;
 
 // Check token expiration every minute
 setInterval(checkTokenExpiration, 60000);

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>سبد خرید - فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/shopping-cart.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <!-- Navigation Placeholder -->
+        <div id="nav-placeholder"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1><i class="fas fa-shopping-cart"></i> سبد خرید</h1>
+                    <p>محصولات انتخاب شده شما</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>در حال بارگذاری سبد خرید...</p>
+                </div>
+
+                <!-- Empty Cart State -->
+                <div
+                    id="empty-cart-state"
+                    class="empty-cart-state"
+                    style="display: none"
+                >
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>سبد خرید شما خالی است</h3>
+                    <p>هنوز محصولی به سبد خرید اضافه نکرده‌اید</p>
+                    <a href="/products" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag"></i>
+                        مشاهده محصولات
+                    </a>
+                </div>
+
+                <!-- Cart Content -->
+                <div
+                    id="cart-content"
+                    class="cart-content"
+                    style="display: none"
+                >
+                    <!-- Cart Items Section -->
+                    <div class="cart-items-section">
+                        <div class="cart-items-header">
+                            <h2>
+                                <i class="fas fa-shopping-bag"></i> محصولات سبد
+                                خرید
+                            </h2>
+                            <span class="items-count" id="items-count"
+                                >0 محصول</span
+                            >
+                        </div>
+                        <div class="cart-items" id="cart-items">
+                            <!-- Cart items will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="cart-summary">
+                        <div class="summary-header">
+                            <h3>خلاصه سفارش</h3>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-row">
+                                <span>تعداد محصولات:</span>
+                                <span id="total-items">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>جمع کل:</span>
+                                <span id="total-price">0 تومان</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>مبلغ نهایی:</span>
+                                <span id="final-price">0 تومان</span>
+                            </div>
+                        </div>
+                        <div class="summary-actions">
+                            <button
+                                class="btn btn-secondary"
+                                onclick="clearCart()"
+                            >
+                                <i class="fas fa-trash"></i>
+                                خالی کردن سبد
+                            </button>
+                            <button
+                                class="btn btn-primary"
+                                onclick="proceedToCheckout()"
+                            >
+                                <i class="fas fa-credit-card"></i>
+                                تکمیل سفارش
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="error-state" style="display: none">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>خطا در بارگذاری سبد خرید</h3>
+                    <p>متأسفانه خطایی در بارگذاری سبد خرید رخ داده است.</p>
+                    <button class="btn btn-primary" onclick="loadCart()">
+                        <i class="fas fa-redo"></i>
+                        تلاش مجدد
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Placeholder -->
+        <div id="footer-placeholder"></div>
+
+        <!-- Clear Cart Confirmation Modal -->
+        <div id="clearCartModal" class="confirmation-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <i class="fas fa-shopping-cart"></i> خالی کردن سبد خرید
+                    </h3>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        آیا مطمئن هستید که می‌خواهید تمام محصولات را از سبد خرید
+                        حذف کنید؟
+                    </p>
+                    <p class="warning-text">این عملیات قابل بازگشت نیست.</p>
+                </div>
+                <div class="modal-actions">
+                    <button
+                        class="btn btn-secondary"
+                        onclick="closeClearCartModal()"
+                    >
+                        <i class="fas fa-times"></i>
+                        انصراف
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmClearCart()">
+                        <i class="fas fa-trash"></i>
+                        خالی کردن سبد
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/common.js"></script>
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/shopping-cart.js"></script>
+    </body>
+</html>

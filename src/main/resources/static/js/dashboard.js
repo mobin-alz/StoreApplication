@@ -41,20 +41,37 @@ async function loadUserData() {
                 welcomeMessage.textContent = `خوش آمدید ${username}!`;
             }
 
-            // Check if user has PROVIDER or ADMIN role to show provider-only section
+            // Check user roles and show appropriate sections
             if (roles) {
                 try {
                     const rolesArray = JSON.parse(roles);
                     const hasProviderRole = rolesArray.some(
-                        (role) =>
-                            role.authority === "PROVIDER" ||
-                            role.authority === "ADMIN"
+                        (role) => role.authority === "PROVIDER"
+                    );
+                    const hasAdminRole = rolesArray.some(
+                        (role) => role.authority === "ADMIN"
                     );
 
+                    // Hide user sections for admin
+                    const placeholderContent = document.querySelector(
+                        ".placeholder-content"
+                    );
+                    if (placeholderContent && hasAdminRole) {
+                        placeholderContent.style.display = "none";
+                    }
+
+                    // Show/hide provider section (only for non-admin providers)
                     const providerSection =
                         document.querySelector(".provider-only");
                     if (providerSection) {
-                        providerSection.style.display = hasProviderRole
+                        providerSection.style.display =
+                            hasProviderRole && !hasAdminRole ? "block" : "none";
+                    }
+
+                    // Show/hide admin section
+                    const adminSection = document.querySelector(".admin-only");
+                    if (adminSection) {
+                        adminSection.style.display = hasAdminRole
                             ? "block"
                             : "none";
                     }

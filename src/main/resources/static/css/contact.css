@@ -65,7 +65,12 @@
     line-height: 1.6;
     animation: fadeInUp 1s ease 0.2s both;
 }
-
+input {
+    font-family: vazir;
+}
+select {
+    font-family: vazir;
+}
 .hero-features {
     display: flex;
     gap: 30px;

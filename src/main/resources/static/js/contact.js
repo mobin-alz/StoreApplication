@@ -55,26 +55,72 @@ function initializeContactForm() {
 }
 
 // Handle form submission
-function handleFormSubmission() {
-    const formData = new FormData(document.getElementById("contactForm"));
+async function handleFormSubmission() {
+    const form = document.getElementById("contactForm");
+    const formData = new FormData(form);
     const submitBtn = document.querySelector(".submit-btn");
+
+    // Validate form before submission
+    if (!validateForm()) {
+        showMessage("لطفاً تمام فیلدهای الزامی را به درستی پر کنید", "error");
+        return;
+    }
 
     // Disable submit button and show loading state
     submitBtn.disabled = true;
     submitBtn.innerHTML =
         '<i class="fas fa-spinner fa-spin"></i> در حال ارسال...';
 
-    // Simulate form submission (replace with actual API call)
-    setTimeout(() => {
-        // Show success message
+    try {
+        // Prepare data for API
+        const messageData = {
+            firstName: formData.get("firstName"),
+            lastName: formData.get("lastName"),
+            email: formData.get("email"),
+            phoneNumber: formData.get("phone") || null,
+            title: formData.get("subject"),
+            message: formData.get("message"),
+        };
+
+        // Send message to API
+        const response = await apiRequest("/api/messages", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(messageData),
+        });
+
+        if (response && response.ok) {
+            const result = await response.json();
+
+            // Show success message
+            showMessage(
+                "پیام شما با موفقیت ارسال شد. در اسرع وقت با شما تماس خواهیم گرفت.",
+                "success"
+            );
+
+            // Reset form
+            form.reset();
+
+            // Clear any field errors
+            const errorElements = form.querySelectorAll(".field-error");
+            errorElements.forEach((error) => error.remove());
+        } else {
+            // Handle API error
+            const errorData = await response.json().catch(() => ({}));
+            const errorMessage =
+                errorData.message ||
+                "خطا در ارسال پیام. لطفاً دوباره تلاش کنید.";
+            showMessage(errorMessage, "error");
+        }
+    } catch (error) {
+        console.error("Error sending message:", error);
         showMessage(
-            "پیام شما با موفقیت ارسال شد. در اسرع وقت با شما تماس خواهیم گرفت.",
-            "success"
+            "خطا در ارسال پیام. لطفاً اتصال اینترنت خود را بررسی کنید.",
+            "error"
         );
-
-        // Reset form
-        document.getElementById("contactForm").reset();
-
+    } finally {
         // Reset submit button
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ارسال پیام';
@@ -84,7 +130,7 @@ function handleFormSubmission() {
             behavior: "smooth",
             block: "start",
         });
-    }, 2000);
+    }
 }
 
 // Initialize animations

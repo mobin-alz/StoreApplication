@@ -98,6 +98,130 @@ function extractFilename(filePath) {
     return filename;
 }
 
+// Shopping Cart Functions
+async function getOrCreateShoppingCart(userId) {
+    try {
+        // First try to get existing cart
+        let response = await apiRequest(`/api/shopping-cart/${userId}`);
+
+        if (response && response.ok) {
+            return await response.json();
+        } else if (response && response.status === 404) {
+            // Create new cart if none exists
+            const createResponse = await apiRequest("/api/shopping-cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ userId: parseInt(userId) }),
+            });
+
+            if (createResponse && createResponse.ok) {
+                return await createResponse.json();
+            }
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting/creating shopping cart:", error);
+        return null;
+    }
+}
+
+async function addItemToCart(cartId, productId, quantity, price) {
+    try {
+        const response = await apiRequest("/api/cart-items", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                cartId: parseInt(cartId),
+                productId: parseInt(productId),
+                quantity: parseInt(quantity),
+                price: parseFloat(price),
+            }),
+        });
+
+        if (response && response.ok) {
+            return await response.json();
+        }
+        return null;
+    } catch (error) {
+        console.error("Error adding to cart:", error);
+        return null;
+    }
+}
+
+async function updateCartItem(cartItemId, cartId, productId, quantity, price) {
+    try {
+        const response = await apiRequest(`/api/cart-items/${cartItemId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                cartId: parseInt(cartId),
+                productId: parseInt(productId),
+                quantity: parseInt(quantity),
+                price: parseFloat(price),
+            }),
+        });
+
+        if (response && response.ok) {
+            return await response.json();
+        }
+        return null;
+    } catch (error) {
+        console.error("Error updating cart item:", error);
+        return null;
+    }
+}
+
+async function removeFromCart(cartItemId) {
+    try {
+        const response = await apiRequest(`/api/cart-items/${cartItemId}`, {
+            method: "DELETE",
+        });
+
+        if (response && response.ok) {
+            return await response.json();
+        }
+        return null;
+    } catch (error) {
+        console.error("Error removing from cart:", error);
+        return null;
+    }
+}
+
+async function getCartItems(cartId) {
+    try {
+        const response = await apiRequest(`/api/cart-items/cart/${cartId}`);
+        if (response && response.ok) {
+            return await response.json();
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting cart items:", error);
+        return null;
+    }
+}
+
+async function deleteShoppingCart(cartId) {
+    try {
+        const response = await apiRequest(`/api/shopping-cart/${cartId}`, {
+            method: "DELETE",
+        });
+
+        if (response && response.ok) {
+            return await response.json();
+        }
+        return null;
+    } catch (error) {
+        console.error("Error deleting shopping cart:", error);
+        return null;
+    }
+}
+
 // Example usage functions
 async function getWishList() {
     const userId = localStorage.getItem("userId");
@@ -140,3 +264,11 @@ async function removeFromWishList(wishListId) {
     }
     return null;
 }
+
+// Make shopping cart functions globally accessible
+window.addItemToCart = addItemToCart;
+window.updateCartItem = updateCartItem;
+window.removeFromCart = removeFromCart;
+window.getCartItems = getCartItems;
+window.deleteShoppingCart = deleteShoppingCart;
+window.getOrCreateShoppingCart = getOrCreateShoppingCart;

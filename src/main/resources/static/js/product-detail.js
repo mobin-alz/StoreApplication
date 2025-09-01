@@ -2,6 +2,7 @@
 
 let currentProduct = null;
 let currentQuantity = 1;
+let cartItemQuantity = 0; // Quantity of this product in cart
 
 // Initialize page when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
@@ -24,6 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Check wishlist status and update button
     checkInitialWishlistStatus();
+
+    // Check cart status and update button
+    checkInitialCartStatus();
 
     // Initialize comments functionality
     initializeComments();
@@ -238,6 +242,12 @@ function displayProductDetails(product) {
         `;
     }
 
+    // Update quantity input max attribute
+    const quantityInput = document.getElementById("quantity");
+    if (quantityInput) {
+        quantityInput.max = product.productQuantity || 1;
+    }
+
     // Show product content and tabs
     const productContent = document.getElementById("product-content");
     const productTabs = document.getElementById("product-tabs");
@@ -282,8 +292,13 @@ function initializeQuantityControls() {
     if (quantityInput) {
         quantityInput.addEventListener("input", function () {
             const value = parseInt(this.value);
+            const maxQuantity = currentProduct?.productQuantity || 1;
+
             if (value < 1) this.value = 1;
-            if (value > 99) this.value = 99;
+            if (value > maxQuantity) {
+                this.value = maxQuantity;
+                showMessage(`حداکثر تعداد موجود: ${maxQuantity}`, "warning");
+            }
             currentQuantity = parseInt(this.value) || 1;
         });
     }
@@ -294,9 +309,13 @@ function increaseQuantity() {
     const quantityInput = document.getElementById("quantity");
     if (quantityInput) {
         const currentValue = parseInt(quantityInput.value) || 1;
-        if (currentValue < 99) {
+        const maxQuantity = currentProduct?.productQuantity || 1;
+
+        if (currentValue < maxQuantity) {
             quantityInput.value = currentValue + 1;
             currentQuantity = currentValue + 1;
+        } else {
+            showMessage(`حداکثر تعداد موجود: ${maxQuantity}`, "warning");
         }
     }
 }
@@ -315,10 +334,17 @@ function decreaseQuantity() {
 
 // Add to cart functionality
 async function addToCart() {
-    if (!currentProduct) return;
+    console.log("addToCart function called");
+    console.log("currentProduct:", currentProduct);
+
+    if (!currentProduct) {
+        console.log("No current product");
+        return;
+    }
 
     const token = localStorage.getItem("token");
     if (!token) {
+        console.log("No token found");
         showMessage("لطفاً ابتدا وارد شوید", "error");
         setTimeout(() => {
             window.location.href = "/login";
@@ -335,57 +361,50 @@ async function addToCart() {
         }
 
         // First, get or create shopping cart
-        let cartResponse = await apiRequest(`/api/shopping-cart/${userId}`);
-        let cart;
-
-        if (cartResponse && cartResponse.status === 404) {
-            // Create new cart
-            const createCartResponse = await apiRequest("/api/shopping-cart", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ userId: parseInt(userId) }),
-            });
-
-            if (!createCartResponse || !createCartResponse.ok) {
-                throw new Error("Failed to create cart");
-            }
-
-            const cartData = await createCartResponse.json();
-            cart = { id: cartData.id };
-        } else if (cartResponse && cartResponse.ok) {
-            cart = await cartResponse.json();
-        } else {
-            throw new Error("Failed to get cart");
+        console.log("Getting or creating shopping cart for user:", userId);
+        const cart = await getOrCreateShoppingCart(userId);
+        console.log("Cart result:", cart);
+        if (!cart) {
+            throw new Error("خطا در ایجاد یا دریافت سبد خرید");
         }
 
         // Add product to cart
-        const addToCartResponse = await apiRequest("/api/cart-items", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                cartId: cart.id,
-                productId: currentProduct.productId,
-                quantity: currentQuantity,
-            }),
+        console.log("Adding item to cart:", {
+            cartId: cart.id,
+            productId: currentProduct.productId,
+            quantity: currentQuantity,
+            price: currentProduct.productPrice || 0,
         });
 
-        if (addToCartResponse && addToCartResponse.ok) {
+        const result = await addItemToCart(
+            cart.id,
+            currentProduct.productId,
+            currentQuantity,
+            currentProduct.productPrice || 0
+        );
+
+        console.log("Add to cart result:", result);
+
+        if (result) {
+            cartItemQuantity = currentQuantity;
+            updateCartButton();
             showMessage("محصول با موفقیت به سبد خرید اضافه شد", "success");
+            // Update cart count in navigation
+            updateCartCount();
         } else {
-            const errorData = await addToCartResponse.json();
-            showMessage(
-                errorData.message || "خطا در افزودن به سبد خرید",
-                "error"
-            );
+            showMessage("خطا در افزودن به سبد خرید", "error");
         }
     } catch (error) {
         console.error("Error adding to cart:", error);
         showMessage("خطا در افزودن به سبد خرید", "error");
     }
+}
+
+// Helper function to extract filename from path
+function extractFilename(filePath) {
+    if (!filePath) return null;
+    const filename = filePath.split(/[\\\/]/).pop();
+    return filename;
 }
 
 // Add to wishlist functionality
@@ -535,6 +554,138 @@ async function checkInitialWishlistStatus() {
         }
     } catch (error) {
         console.error("Error checking initial wishlist status:", error);
+    }
+}
+
+// Check initial cart status when page loads
+async function checkInitialCartStatus() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        return; // User not logged in, button stays in default state
+    }
+
+    try {
+        const productId = getProductIdFromUrl();
+        if (productId) {
+            const quantityInCart = await getProductQuantityInCart(productId);
+            cartItemQuantity = quantityInCart;
+            updateCartButton();
+        }
+    } catch (error) {
+        console.error("Error checking initial cart status:", error);
+    }
+}
+
+// Get quantity of product in cart
+async function getProductQuantityInCart(productId) {
+    try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) return 0;
+
+        const cart = await getOrCreateShoppingCart(userId);
+        if (!cart) return 0;
+
+        const items = await getCartItems(cart.id);
+        if (!items) return 0;
+
+        const cartItem = items.find(
+            (item) => item.product.productId === parseInt(productId)
+        );
+        return cartItem ? cartItem.quantity : 0;
+    } catch (error) {
+        console.error("Error getting product quantity in cart:", error);
+        return 0;
+    }
+}
+
+// Update cart button based on current state
+function updateCartButton() {
+    const addToCartBtn = document.getElementById("add-to-cart-btn");
+    if (!addToCartBtn) return;
+
+    if (cartItemQuantity > 0) {
+        // Product is in cart - show "Update Cart" style
+        addToCartBtn.innerHTML = `
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-quantity-badge">${cartItemQuantity}</span>
+            <span class="btn-text">در سبد خرید</span>
+            <span class="btn-subtext">کلیک برای تغییر</span>
+        `;
+        addToCartBtn.className = "btn-add-cart in-cart";
+        addToCartBtn.onclick = () => updateCartQuantity();
+    } else {
+        // Product not in cart - show "Add to Cart" style
+        addToCartBtn.innerHTML = `
+            <i class="fas fa-shopping-cart"></i>
+            افزودن به سبد خرید
+        `;
+        addToCartBtn.className = "btn-add-cart";
+        addToCartBtn.onclick = () => addToCart();
+    }
+}
+
+// Update cart quantity (when product is already in cart)
+async function updateCartQuantity() {
+    if (!currentProduct) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+        showMessage("لطفاً ابتدا وارد شوید", "error");
+        setTimeout(() => {
+            window.location.href = "/login";
+        }, 2000);
+        return;
+    }
+
+    try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            showMessage("خطا در شناسایی کاربر", "error");
+            return;
+        }
+
+        const cart = await getOrCreateShoppingCart(userId);
+        if (!cart) {
+            throw new Error("خطا در ایجاد یا دریافت سبد خرید");
+        }
+
+        const items = await getCartItems(cart.id);
+        if (!items) {
+            throw new Error("خطا در دریافت آیتم‌های سبد خرید");
+        }
+
+        const cartItem = items.find(
+            (item) => item.product.productId === currentProduct.productId
+        );
+        if (!cartItem) {
+            // If not found, add to cart
+            addToCart();
+            return;
+        }
+
+        // Update existing item
+        const result = await updateCartItem(
+            cartItem.id,
+            cart.id,
+            currentProduct.productId,
+            currentQuantity,
+            currentProduct.productPrice
+        );
+
+        if (result) {
+            cartItemQuantity = currentQuantity;
+            updateCartButton();
+            updateCartCount();
+            showMessage(
+                `تعداد محصول در سبد خرید به ${currentQuantity} تغییر یافت`,
+                "success"
+            );
+        } else {
+            showMessage("خطا در بروزرسانی سبد خرید", "error");
+        }
+    } catch (error) {
+        console.error("Error updating cart quantity:", error);
+        showMessage("خطا در بروزرسانی سبد خرید", "error");
     }
 }
 

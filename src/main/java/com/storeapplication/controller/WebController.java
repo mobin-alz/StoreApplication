@@ -68,4 +68,14 @@ public class WebController {
     public String contact() {
         return "contact";
     }
+    
+    @GetMapping("/shopping-cart")
+    public String shoppingCart() {
+        return "shopping-cart";
+    }   
+
+    @GetMapping("/admin-messages")
+    public String adminMessages() {
+        return "admin-messages";
+    }   
 }
