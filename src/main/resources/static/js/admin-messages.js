@@ -69,7 +69,10 @@ async function loadMessages() {
     } catch (error) {
         console.error("Error loading messages:", error);
         // If it's a 404 error or network error, show empty state instead of error
-        if (error.message.includes("404") || error.message.includes("Failed to fetch")) {
+        if (
+            error.message.includes("404") ||
+            error.message.includes("Failed to fetch")
+        ) {
             messages = [];
             filteredMessages = [];
             displayMessages();
