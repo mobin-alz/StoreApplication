@@ -32,10 +32,19 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize comments functionality
     initializeComments();
 
-    // Ensure delete modal is hidden by default
+    // Ensure modals are hidden by default
     const deleteModal = document.getElementById("deleteCommentModal");
+    const removeProductModal = document.getElementById("removeProductModal");
+    const clearCartModal = document.getElementById("clearCartModal");
+
     if (deleteModal) {
         deleteModal.style.display = "none";
+    }
+    if (removeProductModal) {
+        removeProductModal.style.display = "none";
+    }
+    if (clearCartModal) {
+        clearCartModal.style.display = "none";
     }
 });
 
@@ -604,7 +613,7 @@ function updateCartButton() {
     if (!addToCartBtn) return;
 
     if (cartItemQuantity > 0) {
-        // Product is in cart - show "Update Cart" style
+        // Product is in cart - show "Update Cart" style with remove option
         addToCartBtn.innerHTML = `
             <i class="fas fa-shopping-cart"></i>
             <span class="cart-quantity-badge">${cartItemQuantity}</span>
@@ -613,6 +622,9 @@ function updateCartButton() {
         `;
         addToCartBtn.className = "btn-add-cart in-cart";
         addToCartBtn.onclick = () => updateCartQuantity();
+
+        // Add remove button next to the cart button
+        addRemoveButton();
     } else {
         // Product not in cart - show "Add to Cart" style
         addToCartBtn.innerHTML = `
@@ -621,6 +633,9 @@ function updateCartButton() {
         `;
         addToCartBtn.className = "btn-add-cart";
         addToCartBtn.onclick = () => addToCart();
+
+        // Remove the remove button if it exists
+        removeRemoveButton();
     }
 }
 
@@ -689,6 +704,117 @@ async function updateCartQuantity() {
     }
 }
 
+// Add remove button next to cart button
+function addRemoveButton() {
+    // Check if remove button already exists
+    if (document.getElementById("remove-from-cart-btn")) {
+        return;
+    }
+
+    const productActions = document.querySelector(".product-actions");
+    if (!productActions) return;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.id = "remove-from-cart-btn";
+    removeBtn.className = "btn-remove-cart";
+    removeBtn.innerHTML = `
+        <i class="fas fa-trash-alt"></i>
+        حذف از سبد خرید
+    `;
+    removeBtn.onclick = () => removeProductFromCart();
+
+    // Insert after the add to cart button
+    const addToCartBtn = document.getElementById("add-to-cart-btn");
+    if (addToCartBtn && addToCartBtn.nextSibling) {
+        productActions.insertBefore(removeBtn, addToCartBtn.nextSibling);
+    } else {
+        productActions.appendChild(removeBtn);
+    }
+}
+
+// Remove the remove button
+function removeRemoveButton() {
+    const removeBtn = document.getElementById("remove-from-cart-btn");
+    if (removeBtn) {
+        removeBtn.remove();
+    }
+}
+
+// Remove product from cart
+function removeProductFromCart() {
+    if (!currentProduct) return;
+
+    // Show confirmation modal
+    const modal = document.getElementById("removeProductModal");
+    if (modal) {
+        modal.style.display = "flex";
+    }
+}
+
+// Close remove product modal
+function closeRemoveProductModal() {
+    const modal = document.getElementById("removeProductModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Confirm remove product from cart
+async function confirmRemoveProduct() {
+    if (!currentProduct) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+        showMessage("لطفاً ابتدا وارد شوید", "error");
+        setTimeout(() => {
+            window.location.href = "/login";
+        }, 2000);
+        return;
+    }
+
+    try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            showMessage("خطا در شناسایی کاربر", "error");
+            return;
+        }
+
+        const cart = await getOrCreateShoppingCart(userId);
+        if (!cart) {
+            throw new Error("خطا در ایجاد یا دریافت سبد خرید");
+        }
+
+        const items = await getCartItems(cart.id);
+        if (!items) {
+            throw new Error("خطا در دریافت آیتم‌های سبد خرید");
+        }
+
+        const cartItem = items.find(
+            (item) => item.product.productId === currentProduct.productId
+        );
+        if (!cartItem) {
+            showMessage("محصول در سبد خرید یافت نشد", "error");
+            return;
+        }
+
+        // Remove item from cart using the API function
+        const result = await window.removeFromCart(cartItem.id);
+
+        if (result) {
+            cartItemQuantity = 0;
+            updateCartButton();
+            updateCartCount();
+            showMessage("محصول از سبد خرید حذف شد", "success");
+            closeRemoveProductModal();
+        } else {
+            showMessage("خطا در حذف محصول از سبد خرید", "error");
+        }
+    } catch (error) {
+        console.error("Error removing from cart:", error);
+        showMessage("خطا در حذف محصول از سبد خرید", "error");
+    }
+}
+
 // Zoom image functionality
 function zoomImage() {
     const mainImage = document.getElementById("main-image");
@@ -718,9 +844,22 @@ function closeZoomModal() {
 
 // Close modal when clicking outside
 document.addEventListener("click", function (event) {
-    const modal = document.getElementById("zoomModal");
-    if (modal && event.target === modal) {
+    const zoomModal = document.getElementById("zoomModal");
+    const deleteCommentModal = document.getElementById("deleteCommentModal");
+    const clearCartModal = document.getElementById("clearCartModal");
+    const removeProductModal = document.getElementById("removeProductModal");
+
+    if (zoomModal && event.target === zoomModal) {
         closeZoomModal();
+    }
+    if (deleteCommentModal && event.target === deleteCommentModal) {
+        closeDeleteCommentModal();
+    }
+    if (clearCartModal && event.target === clearCartModal) {
+        closeClearCartModal();
+    }
+    if (removeProductModal && event.target === removeProductModal) {
+        closeRemoveProductModal();
     }
 });
 

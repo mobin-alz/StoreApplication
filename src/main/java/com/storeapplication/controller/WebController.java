@@ -78,4 +78,9 @@ public class WebController {
     public String adminMessages() {
         return "admin-messages";
     }   
+    
+    @GetMapping("/dashboard/users")
+    public String dashboardUsers() {
+        return "dashboard-users";
+    }
 }

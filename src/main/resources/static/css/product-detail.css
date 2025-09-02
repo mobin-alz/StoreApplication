@@ -51,6 +51,7 @@ body {
     background: var(--white);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
+    margin-top: 4rem;
 }
 
 .breadcrumb-link {
@@ -387,6 +388,38 @@ body {
 
 .btn-add-cart.in-cart:hover {
     background: linear-gradient(135deg, #5a67d8, #6b46c1);
+}
+
+/* Remove from cart button */
+.btn-remove-cart {
+    flex: 1;
+    background: linear-gradient(135deg, var(--danger), #e53e3e);
+    color: var(--white);
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow);
+    font-family: vazir;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-remove-cart:hover {
+    background: linear-gradient(135deg, #e53e3e, #c53030);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-remove-cart:active {
+    transform: translateY(0);
 }
 
 .cart-quantity-badge {
