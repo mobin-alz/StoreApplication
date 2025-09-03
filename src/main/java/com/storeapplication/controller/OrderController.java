@@ -38,8 +38,9 @@ public class OrderController {
 
     private Order convertDtoToEntity(OrderRequestDto orderDto) {
         Order order = new Order();
-        
-        User user = userService.findById(orderDto.getUserId().intValue());
+
+        User user = userService.findById(Math.toIntExact(orderDto.getUserId()));
+
         order.setUser(user);
         
         order.setTotalAmount(orderDto.getTotalAmount());
@@ -125,9 +126,4 @@ public class OrderController {
         return ResponseEntity.ok(new BaseResponse("Order deleted successfully", true));
     }
 
-    @GetMapping("/status/{status}")
-    @Operation(summary = "Get orders by status", description = "Retrieve all orders with a specific status")
-    public ResponseEntity<List<Order>> getOrdersByStatus(@PathVariable OrderStatus status) {
-        return ResponseEntity.ok(new ArrayList<>());
-    }
 } 

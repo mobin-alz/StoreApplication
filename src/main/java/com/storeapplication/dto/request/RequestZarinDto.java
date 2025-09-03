@@ -1,5 +1,6 @@
 package com.storeapplication.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import lombok.*;
 public class RequestZarinDto {
     @NotNull
     @NotBlank
-    private String merchant_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+    @Schema(defaultValue = "\"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"")
 
     @NotNull
     @NotBlank
@@ -26,6 +27,7 @@ public class RequestZarinDto {
 
     @NotNull
     @NotBlank
+    @Schema(defaultValue = "locahost:8080/callback")
     private String callback_url = "localhost:8080/callback";
 
 
