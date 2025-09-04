@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.HashMap;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +17,8 @@ import lombok.*;
 public class RequestZarinDto {
     @NotNull
     @NotBlank
-    @Schema(defaultValue = "\"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"")
+    @Schema(defaultValue = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+    private String merchant_id;
 
     @NotNull
     @NotBlank
@@ -27,8 +30,10 @@ public class RequestZarinDto {
 
     @NotNull
     @NotBlank
-    @Schema(defaultValue = "locahost:8080/callback")
+    @Schema(defaultValue = "http://localhost:8080/callback")
     private String callback_url = "localhost:8080/callback";
 
+    @Schema(type = "object", example = "{\"user_id\": \"1\", \"order_id\": \"123\"}")
+    private HashMap<String,String> metadata = new HashMap<>();
 
 }
