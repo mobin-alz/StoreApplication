@@ -83,9 +83,21 @@ async function handleSuccessfulPayment() {
 
 // Handle failed payment
 function handleFailedPayment() {
+    // Get order ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get("orderId");
+
     // Show error state
     document.getElementById("loading-state").style.display = "none";
     document.getElementById("error-state").style.display = "block";
+
+    // Update the retry button to include order ID
+    if (orderId) {
+        const retryButton = document.getElementById("retry-payment-btn");
+        if (retryButton) {
+            retryButton.onclick = () => retryPayment(orderId);
+        }
+    }
 }
 
 // Show error message
@@ -109,6 +121,79 @@ function goToOrders() {
 // Go to checkout page
 function goToCheckout() {
     window.location.href = "/checkout";
+}
+
+// Retry payment for failed order
+async function retryPayment(orderId) {
+    try {
+        // Get order details to get the amount
+        const response = await apiRequest(`/api/orders/${orderId}`);
+        if (!response || !response.ok) {
+            alert("خطا در دریافت اطلاعات سفارش");
+            return;
+        }
+
+        const order = await response.json();
+        const amount = order.totalAmount;
+
+        // Store order info for callback
+        localStorage.setItem(`order_${orderId}_amount`, amount.toString());
+
+        // Initiate Zarinpal payment
+        await initiateZarinpalPayment(amount, orderId);
+    } catch (error) {
+        console.error("Error retrying payment:", error);
+        alert("خطا در شروع پرداخت مجدد");
+    }
+}
+
+// Initiate Zarinpal payment
+async function initiateZarinpalPayment(amount, orderId) {
+    try {
+        const userId = localStorage.getItem("userId");
+        const requestBody = {
+            merchant_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", // Replace with your actual merchant ID
+            amount: parseInt(amount),
+            description: `پرداخت سفارش شماره ${orderId}`,
+            callback_url: `http://localhost:8080/callback?orderId=${orderId}`,
+            metadata: {
+                user_id: userId || "1",
+                order_id: orderId.toString(),
+            },
+        };
+
+        const response = await apiRequest("/api/zarin/request", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response || !response.ok) {
+            const errorText = await response.text();
+            console.error(
+                "Zarinpal request failed:",
+                response.status,
+                errorText
+            );
+            throw new Error("Failed to initiate payment");
+        }
+
+        const result = await response.json();
+
+        if (result.data && result.data.authority) {
+            // Redirect to Zarinpal payment page
+            const paymentUrl = `https://sandbox.zarinpal.com/pg/StartPay/${result.data.authority}`;
+            window.location.href = paymentUrl;
+        } else {
+            throw new Error("Invalid response from payment gateway");
+        }
+    } catch (error) {
+        console.error("Error calling Zarinpal API:", error);
+        throw error;
+    }
 }
 
 // Go to home page

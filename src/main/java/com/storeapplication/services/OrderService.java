@@ -62,6 +62,20 @@ public class OrderService {
         }
     }
 
+    public String updateOrderUserId(Long id, Long userId) {
+        try {
+            Order order = orderRepository.findById(id).orElse(null);
+            if (order != null) {
+                order.setUserId(userId);
+                orderRepository.save(order);
+                return null;
+            }
+            return "Order not found";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
 
 
 

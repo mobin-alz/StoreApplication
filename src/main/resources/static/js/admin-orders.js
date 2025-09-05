@@ -82,6 +82,9 @@ async function loadOrders() {
         if (orders.length === 0) {
             showEmptyState();
         } else {
+            // Load user information for each order
+            await loadUserInfoForOrders();
+
             // Initialize filtered orders
             filteredOrders = [...orders];
             updateOrderStats();
@@ -90,6 +93,43 @@ async function loadOrders() {
     } catch (error) {
         console.error("Error loading orders:", error);
         showError("خطا در بارگذاری سفارشات");
+    }
+}
+
+// Load user information for all orders using userId
+async function loadUserInfoForOrders() {
+    // Show loading state while fetching user info
+    const loadingElement = document.getElementById("loading-state");
+    if (loadingElement) {
+        loadingElement.style.display = "block";
+    }
+
+    const userPromises = orders.map(async (order) => {
+        if (order.userId) {
+            try {
+                const userResponse = await apiRequest(
+                    `/api/users/${order.userId}`
+                );
+                if (userResponse && userResponse.ok) {
+                    const user = await userResponse.json();
+                    order.user = user;
+                }
+            } catch (error) {
+                console.error(
+                    `Error loading user ${order.userId} for order ${order.id}:`,
+                    error
+                );
+                // Keep the order but without user info
+            }
+        }
+        return order;
+    });
+
+    await Promise.all(userPromises);
+
+    // Hide loading state
+    if (loadingElement) {
+        loadingElement.style.display = "none";
     }
 }
 
@@ -235,10 +275,16 @@ function createOrderElement(order) {
             <div class="detail-item">
                 <div class="detail-label">مشتری</div>
                 <div class="customer-info">
-                    <div class="customer-name">کاربر ${
-                        order.user?.id || "نامشخص"
+                    <div class="customer-name">${
+                        order.user?.username ||
+                        (order.userId ? `کاربر ${order.userId}` : "نامشخص")
                     }</div>
-                    <div class="customer-id">ID: ${order.user?.id || "-"}</div>
+                    
+                    ${
+                        !order.user && order.userId
+                            ? '<div class="loading-user">در حال بارگذاری...</div>'
+                            : ""
+                    }
                 </div>
             </div>
             <div class="detail-item">
@@ -248,42 +294,43 @@ function createOrderElement(order) {
                 )} تومان</div>
             </div>
             <div class="detail-item">
-                <div class="detail-label">تعداد محصولات</div>
-                <div class="detail-value">${productsCount} محصول</div>
+                <div class="detail-label">محصولات</div>
+                <div class="products-preview">
+                    ${
+                        order.orderProducts && order.orderProducts.length > 0
+                            ? `
+                        ${order.orderProducts
+                            .slice(0, 3)
+                            .map(
+                                (item) => `
+                            <div class="product-preview">
+                                <i class="fas fa-box"></i>
+                                ${item.product?.productName || "محصول نامشخص"}
+                            </div>
+                        `
+                            )
+                            .join("")}
+                        ${
+                            order.orderProducts.length > 3
+                                ? `
+                            <div class="product-preview">
+                                <i class="fas fa-ellipsis-h"></i>
+                                +${order.orderProducts.length - 3} محصول دیگر
+                            </div>
+                        `
+                                : ""
+                        }
+                        `
+                            : `
+                        <div class="no-products">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>محصولی یافت نشد</span>
+                        </div>
+                        `
+                    }
+                </div>
             </div>
         </div>
-        
-        ${
-            order.orderProducts && order.orderProducts.length > 0
-                ? `
-        <div class="order-products">
-            <div class="products-preview">
-                ${order.orderProducts
-                    .slice(0, 3)
-                    .map(
-                        (item) => `
-                    <div class="product-preview">
-                        <i class="fas fa-box"></i>
-                        ${item.product?.productName || "محصول نامشخص"}
-                    </div>
-                `
-                    )
-                    .join("")}
-                ${
-                    order.orderProducts.length > 3
-                        ? `
-                    <div class="product-preview">
-                        <i class="fas fa-ellipsis-h"></i>
-                        +${order.orderProducts.length - 3} محصول دیگر
-                    </div>
-                `
-                        : ""
-                }
-            </div>
-        </div>
-        `
-                : ""
-        }
     `;
 
     return orderDiv;

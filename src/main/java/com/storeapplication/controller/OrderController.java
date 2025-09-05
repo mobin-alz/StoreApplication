@@ -42,6 +42,7 @@ public class OrderController {
         User user = userService.findById(Math.toIntExact(orderDto.getUserId()));
 
         order.setUser(user);
+        order.setUserId(orderDto.getUserId());
         
         order.setTotalAmount(orderDto.getTotalAmount());
         
@@ -75,6 +76,41 @@ public class OrderController {
     public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long userId) {
         List<Order> orders = orderService.findAllByUserId(userId);
         return ResponseEntity.ok(orders);
+    }
+
+    @PutMapping("/{id}/user-id")
+    @Operation(summary = "Update order userId", description = "Update the userId field for an existing order")
+    public ResponseEntity<?> updateOrderUserId(@PathVariable Long id, @RequestParam Long userId) {
+        String result = orderService.updateOrderUserId(id, userId);
+        if (result == null) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().body(new BaseResponse(result, false));
+        }
+    }
+
+    @PutMapping("/update-user-ids")
+    @Operation(summary = "Update all order userIds", description = "Update userId field for all existing orders based on their user relationship")
+    public ResponseEntity<?> updateAllOrderUserIds() {
+        try {
+            List<Order> orders = orderService.findAll();
+            int updatedCount = 0;
+            
+            for (Order order : orders) {
+                if (order.getUser() != null && order.getUserId() == null) {
+                    order.setUserId(order.getUser().getId());
+                    orderService.saveOrder(order);
+                    updatedCount++;
+                }
+            }
+            
+            return ResponseEntity.ok(new BaseResponse(
+                String.format("Successfully updated %d orders with userId", updatedCount), 
+                true
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new BaseResponse(e.getMessage(), false));
+        }
     }
 
     @PostMapping

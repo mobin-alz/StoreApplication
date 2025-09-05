@@ -176,6 +176,18 @@
     transform: translateY(-2px);
 }
 
+.btn-outline {
+    background: transparent;
+    color: var(--text-muted);
+    border: 2px solid var(--border-color);
+}
+
+.btn-outline:hover {
+    background: var(--border-color);
+    color: var(--text-dark);
+    transform: translateY(-2px);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .loading-state,

@@ -6,14 +6,8 @@
         <title>پردازش پرداخت - فروشگاه آنلاین</title>
         <link rel="stylesheet" href="/css/common.css" />
         <link rel="stylesheet" href="/css/callback.css" />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;600;700&display=swap"
-            rel="stylesheet"
-        />
+        <link rel="stylesheet" href="/css/fontawesome/all.min.css" />
+        <link href="/fonts/vazir.css" rel="stylesheet" />
     </head>
     <body>
         <!-- Navigation Placeholder -->
@@ -56,13 +50,21 @@
                     <p>متأسفانه پرداخت شما ناموفق بود یا توسط شما لغو شد.</p>
                     <div class="error-actions">
                         <button
+                            id="retry-payment-btn"
                             class="btn btn-primary"
                             onclick="goToCheckout()"
                         >
-                            <i class="fas fa-redo"></i>
-                            تلاش مجدد
+                            <i class="fas fa-credit-card"></i>
+                            تکمیل پرداخت
                         </button>
-                        <button class="btn btn-secondary" onclick="goToHome()">
+                        <button
+                            class="btn btn-secondary"
+                            onclick="goToOrders()"
+                        >
+                            <i class="fas fa-list"></i>
+                            مشاهده سفارشات
+                        </button>
+                        <button class="btn btn-outline" onclick="goToHome()">
                             <i class="fas fa-home"></i>
                             بازگشت به خانه
                         </button>

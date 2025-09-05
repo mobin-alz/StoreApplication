@@ -201,27 +201,85 @@ function createOrderElement(order) {
 
     orderDiv.innerHTML = `
         <div class="order-header">
-            <div class="order-info">
-                <div class="order-number">سفارش شماره ${order.id}</div>
-                <div class="order-date">${formattedDate}</div>
+            <div class="order-title">
+                <div class="order-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="order-info">
+                    <h3>سفارش شماره ${order.id}</h3>
+                    <div class="order-date">${formattedDate}</div>
+                </div>
             </div>
-            <div class="order-status ${statusClass}">${statusText}</div>
+            <div class="order-header-actions">
+                <div class="order-status ${statusClass}">${statusText}</div>
+                ${
+                    order.status === "PENDING"
+                        ? `
+                    <button class="btn btn-payment" onclick="retryPayment(${order.id})">
+                        <i class="fas fa-credit-card"></i>
+                        تکمیل پرداخت
+                    </button>
+                `
+                        : ""
+                }
+            </div>
         </div>
         
         <div class="order-details">
             <div class="order-items">
                 ${
-                    order.orderProducts
-                        ? order.orderProducts
-                              .map((item) => createOrderItemHTML(item))
-                              .join("")
-                        : ""
+                    order.orderProducts && order.orderProducts.length > 0
+                        ? `
+                        <div class="products-preview">
+                            ${order.orderProducts
+                                .slice(0, 3)
+                                .map(
+                                    (item) => `
+                                <div class="product-preview">
+                                    <i class="fas fa-box"></i>
+                                    ${
+                                        item.product?.productName ||
+                                        "محصول نامشخص"
+                                    }
+                                </div>
+                            `
+                                )
+                                .join("")}
+                            ${
+                                order.orderProducts.length > 3
+                                    ? `
+                                <div class="product-preview">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    +${
+                                        order.orderProducts.length - 3
+                                    } محصول دیگر
+                                </div>
+                            `
+                                    : ""
+                            }
+                        </div>
+                        `
+                        : `
+                        <div class="no-products">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>محصولی در این سفارش یافت نشد</span>
+                        </div>
+                        `
                 }
             </div>
             <div class="order-summary">
-                <div class="order-total">${formatPrice(
-                    order.totalAmount
-                )} تومان</div>
+                <div class="summary-item">
+                    <span class="summary-label">تعداد محصولات:</span>
+                    <span class="summary-value">${
+                        order.orderProducts ? order.orderProducts.length : 0
+                    }</span>
+                </div>
+                <div class="summary-item total">
+                    <span class="summary-label">مبلغ کل:</span>
+                    <span class="summary-value">${formatPrice(
+                        order.totalAmount
+                    )} تومان</span>
+                </div>
             </div>
         </div>
         
@@ -235,7 +293,7 @@ function createOrderElement(order) {
             ${
                 order.status === "PENDING"
                     ? `
-                <button class="btn btn-secondary" onclick="cancelOrder(${order.id})">
+                <button class="btn btn-danger" onclick="cancelOrder(${order.id})">
                     <i class="fas fa-times"></i>
                     لغو سفارش
                 </button>
@@ -293,6 +351,79 @@ function getStatusClass(status) {
 // View order details
 function viewOrderDetails(orderId) {
     window.location.href = `/order/${orderId}`;
+}
+
+// Retry payment for PENDING order
+async function retryPayment(orderId) {
+    try {
+        // Get order details to get the amount
+        const response = await apiRequest(`/api/orders/${orderId}`);
+        if (!response || !response.ok) {
+            showMessage("خطا در دریافت اطلاعات سفارش", "error");
+            return;
+        }
+
+        const order = await response.json();
+        const amount = order.totalAmount;
+
+        // Store order info for callback
+        localStorage.setItem(`order_${orderId}_amount`, amount.toString());
+
+        // Initiate Zarinpal payment
+        await initiateZarinpalPayment(amount, orderId);
+    } catch (error) {
+        console.error("Error retrying payment:", error);
+        showMessage("خطا در شروع پرداخت مجدد", "error");
+    }
+}
+
+// Initiate Zarinpal payment
+async function initiateZarinpalPayment(amount, orderId) {
+    try {
+        const userId = localStorage.getItem("userId");
+        const requestBody = {
+            merchant_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", // Replace with your actual merchant ID
+            amount: parseInt(amount),
+            description: `پرداخت سفارش شماره ${orderId}`,
+            callback_url: `http://localhost:8080/callback?orderId=${orderId}`,
+            metadata: {
+                user_id: userId || "1",
+                order_id: orderId.toString(),
+            },
+        };
+
+        const response = await apiRequest("/api/zarin/request", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response || !response.ok) {
+            const errorText = await response.text();
+            console.error(
+                "Zarinpal request failed:",
+                response.status,
+                errorText
+            );
+            throw new Error("Failed to initiate payment");
+        }
+
+        const result = await response.json();
+
+        if (result.data && result.data.authority) {
+            // Redirect to Zarinpal payment page
+            const paymentUrl = `https://sandbox.zarinpal.com/pg/StartPay/${result.data.authority}`;
+            window.location.href = paymentUrl;
+        } else {
+            throw new Error("Invalid response from payment gateway");
+        }
+    } catch (error) {
+        console.error("Error calling Zarinpal API:", error);
+        throw error;
+    }
 }
 
 // Cancel order

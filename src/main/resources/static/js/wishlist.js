@@ -21,11 +21,14 @@ async function initializeWishlist() {
         return;
     }
 
-    // Check if user has USER or PROVIDER role (not ADMIN)
+    // Check if user has USER, PROVIDER, or ADMIN role
     try {
         const rolesArray = JSON.parse(roles);
         const hasRequiredRole = rolesArray.some(
-            (role) => role.authority === "USER" || role.authority === "PROVIDER"
+            (role) =>
+                role.authority === "USER" ||
+                role.authority === "PROVIDER" ||
+                role.authority === "ADMIN"
         );
 
         if (!hasRequiredRole) {

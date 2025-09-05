@@ -303,6 +303,7 @@
     pointer-events: auto !important; /* Force pointer events */
     user-select: none;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    font-family: vazir;
 }
 
 .btn-primary.btn-enhanced {

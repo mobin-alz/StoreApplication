@@ -14,16 +14,17 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // Check if user has provider role
+    // Check if user has provider or admin role
 
     try {
         const rolesArray = JSON.parse(roles);
 
-        const hasProviderRole = rolesArray.some(
-            (role) => role.authority === "PROVIDER"
+        const hasRequiredRole = rolesArray.some(
+            (role) =>
+                role.authority === "PROVIDER" || role.authority === "ADMIN"
         );
 
-        if (!hasProviderRole) {
+        if (!hasRequiredRole) {
             showMessage("شما دسترسی به این صفحه را ندارید", "error");
 
             setTimeout(() => {
