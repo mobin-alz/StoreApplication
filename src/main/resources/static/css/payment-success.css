@@ -1,0 +1,273 @@
+/* Payment Success Page Styles */
+
+.success-container {
+    max-width: 600px;
+    margin: 4rem auto;
+    text-align: center;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    padding: 3rem 2rem;
+}
+
+/* Success Icon */
+.success-icon {
+    margin-bottom: 2rem;
+}
+
+.success-icon i {
+    font-size: 5rem;
+    color: var(--success);
+    animation: bounce 1s ease-in-out;
+}
+
+@keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Success Message */
+.success-container h1 {
+    color: var(--text-dark);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--success), #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.success-message {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Error Message */
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--danger);
+    font-weight: 500;
+}
+
+.error-message i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.error-message span {
+    flex: 1;
+    text-align: right;
+}
+
+/* Order Info */
+.order-info {
+    margin: 2rem 0;
+}
+
+.info-card {
+    background: var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: right;
+}
+
+.info-card h3 {
+    color: var(--text-dark);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.info-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.order-number {
+    font-weight: 700;
+    color: var(--primary);
+    font-family: "Courier New", monospace;
+}
+
+.status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.status.paid {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+/* Success Actions */
+.success-actions {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+    justify-content: center;
+}
+
+.success-actions .btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    min-width: 180px;
+    justify-content: center;
+}
+
+.btn-secondary {
+    background: var(--light-gray);
+    color: var(--text-dark);
+    border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    color: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #8b5cf6, var(--primary));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Next Steps */
+.next-steps {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    text-align: right;
+}
+
+.next-steps h3 {
+    color: var(--text-dark);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.next-steps ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.next-steps li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.next-steps li i {
+    color: var(--success);
+    font-size: 0.9rem;
+    width: 16px;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .success-container {
+        margin: 2rem auto;
+        padding: 2rem 1.5rem;
+    }
+
+    .success-container h1 {
+        font-size: 1.75rem;
+    }
+
+    .success-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .success-actions .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .info-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .info-row {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .success-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .success-icon i {
+        font-size: 4rem;
+    }
+
+    .success-container h1 {
+        font-size: 1.5rem;
+    }
+
+    .success-message {
+        font-size: 1rem;
+    }
+
+    .info-card {
+        padding: 1rem;
+    }
+}

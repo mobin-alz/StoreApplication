@@ -74,6 +74,37 @@ public class WebController {
         return "shopping-cart";
     }   
 
+    @GetMapping("/checkout")
+    public String checkout() {
+        return "checkout";
+    }
+
+
+    @GetMapping("/payment-success")
+    public String paymentSuccess() {
+        return "payment-success";
+    }
+
+    @GetMapping("/callback")
+    public String callback() {
+        return "callback";
+    }
+
+    @GetMapping("/dashboard/orders")
+    public String dashboardOrders() {
+        return "dashboard-orders";
+    }
+
+    @GetMapping("/admin/orders")
+    public String adminOrders() {
+        return "admin-orders";
+    }
+
+    @GetMapping("/order/{id}")
+    public String orderDetail() {
+        return "order-detail";
+    }
+
     @GetMapping("/admin-messages")
     public String adminMessages() {
         return "admin-messages";

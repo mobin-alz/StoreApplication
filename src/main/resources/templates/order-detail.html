@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>جزئیات سفارش - فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/order-detail.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <!-- Navigation Placeholder -->
+        <div id="nav-placeholder"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1><i class="fas fa-receipt"></i> جزئیات سفارش</h1>
+                    <p>مشاهده اطلاعات کامل سفارش</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>در حال بارگذاری جزئیات سفارش...</p>
+                </div>
+
+                <!-- Order Details Content -->
+                <div
+                    id="order-content"
+                    class="order-content"
+                    style="display: none"
+                >
+                    <!-- Order Header -->
+                    <div class="order-header">
+                        <div class="order-header-content">
+                            <div class="order-title">
+                                <h1>جزئیات سفارش</h1>
+                                <p>
+                                    شماره سفارش:
+                                    <span id="order-id" class="order-number"
+                                        >-</span
+                                    >
+                                </p>
+                            </div>
+                            <div class="order-status-badge">
+                                <span id="order-status" class="status">-</span>
+                            </div>
+                        </div>
+                        <div class="order-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span
+                                    >تاریخ سفارش:
+                                    <span id="order-date">-</span></span
+                                >
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span
+                                    >مبلغ کل:
+                                    <span id="order-total" class="amount"
+                                        >-</span
+                                    ></span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Timeline -->
+                    <div class="order-timeline">
+                        <div class="timeline-header">
+                            <h3><i class="fas fa-route"></i> وضعیت سفارش</h3>
+                        </div>
+                        <div class="timeline-steps" id="timeline-steps">
+                            <!-- Timeline steps will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Order Products -->
+                    <div class="order-products-section">
+                        <div class="section-header">
+                            <h3>
+                                <i class="fas fa-shopping-bag"></i> محصولات
+                                سفارش
+                            </h3>
+                            <div class="products-count">
+                                <span id="products-count">0</span> محصول
+                            </div>
+                        </div>
+                        <div class="products-grid" id="products-list">
+                            <!-- Products will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="order-summary-section">
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <h3>
+                                    <i class="fas fa-calculator"></i> خلاصه
+                                    سفارش
+                                </h3>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-row">
+                                    <span>تعداد محصولات:</span>
+                                    <span id="summary-items-count">0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>جمع کل:</span>
+                                    <span id="summary-subtotal">0 تومان</span>
+                                </div>
+                                <div class="summary-divider"></div>
+                                <div class="summary-row total">
+                                    <span>مبلغ نهایی:</span>
+                                    <span id="summary-total">0 تومان</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Actions -->
+                    <div class="order-actions-section" id="order-actions">
+                        <!-- Actions will be loaded based on user role and order status -->
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="error-state" style="display: none">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>خطا در بارگذاری سفارش</h3>
+                    <p>متأسفانه خطایی در بارگذاری جزئیات سفارش رخ داده است.</p>
+                    <button
+                        class="btn btn-primary"
+                        onclick="loadOrderDetails()"
+                    >
+                        <i class="fas fa-redo"></i>
+                        تلاش مجدد
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Placeholder -->
+        <div id="footer-placeholder"></div>
+
+        <!-- Status Update Modal -->
+        <div id="statusModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-edit"></i> تغییر وضعیت سفارش</h3>
+                    <button class="close-btn" onclick="closeStatusModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="new-status">وضعیت جدید:</label>
+                        <select id="new-status">
+                            <option value="PENDING">در انتظار پرداخت</option>
+                            <option value="PAID">پرداخت شده</option>
+                            <option value="SHIPPED">ارسال شده</option>
+                            <option value="CANCELED">لغو شده</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button
+                        class="btn btn-secondary"
+                        onclick="closeStatusModal()"
+                    >
+                        <i class="fas fa-times"></i>
+                        انصراف
+                    </button>
+                    <button
+                        class="btn btn-primary"
+                        onclick="updateOrderStatus()"
+                    >
+                        <i class="fas fa-save"></i>
+                        ذخیره تغییرات
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/common.js"></script>
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/order-detail.js"></script>
+    </body>
+</html>

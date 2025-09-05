@@ -248,9 +248,8 @@ function proceedToCheckout() {
         return;
     }
 
-    // For now, just show a message
-    // In a real application, this would redirect to checkout page
-    showMessage("این قابلیت در نسخه فعلی در دسترس نیست", "info");
+    // Redirect to checkout page
+    window.location.href = "/checkout";
 }
 
 // Update cart summary

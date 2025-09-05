@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>پرداخت موفق - فروشگاه آنلاین</title>
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/payment-success.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <!-- Navigation Placeholder -->
+        <div id="nav-placeholder"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Success Content -->
+                <div class="success-container">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+
+                    <h1>پرداخت با موفقیت انجام شد!</h1>
+                    <p class="success-message" id="success-message">
+                        سفارش شما با موفقیت ثبت و پرداخت شد.
+                    </p>
+
+                    <!-- Error message (hidden by default) -->
+                    <div
+                        class="error-message"
+                        id="error-message"
+                        style="display: none"
+                    >
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+
+                    <div class="order-info">
+                        <div class="info-card">
+                            <h3>
+                                <i class="fas fa-receipt"></i> اطلاعات سفارش
+                            </h3>
+                            <div class="info-details">
+                                <div class="info-row">
+                                    <span>شماره سفارش:</span>
+                                    <span id="order-id" class="order-number"
+                                        >-</span
+                                    >
+                                </div>
+                                <div class="info-row">
+                                    <span>تاریخ سفارش:</span>
+                                    <span id="order-date">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span>وضعیت:</span>
+                                    <span class="status paid">پرداخت شده</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-actions">
+                        <button class="btn btn-secondary" onclick="goToHome()">
+                            <i class="fas fa-home"></i>
+                            بازگشت به خانه
+                        </button>
+                        <button class="btn btn-primary" onclick="goToOrders()">
+                            <i class="fas fa-list"></i>
+                            مشاهده سفارشات من
+                        </button>
+                    </div>
+
+                    <div class="next-steps">
+                        <h3>مراحل بعدی:</h3>
+                        <ul>
+                            <li>
+                                <i class="fas fa-check"></i> سفارش شما در حال
+                                آماده‌سازی است
+                            </li>
+                            <li>
+                                <i class="fas fa-truck"></i> به زودی برای ارسال
+                                آماده خواهد شد
+                            </li>
+                            <li>
+                                <i class="fas fa-bell"></i> از طریق پیامک از
+                                وضعیت سفارش مطلع خواهید شد
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Placeholder -->
+        <div id="footer-placeholder"></div>
+
+        <!-- Scripts -->
+        <script src="/js/common.js"></script>
+        <script src="/js/api-utils.js"></script>
+        <script src="/js/payment-success.js"></script>
+    </body>
+</html>

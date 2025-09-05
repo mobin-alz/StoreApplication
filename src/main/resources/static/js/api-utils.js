@@ -43,6 +43,7 @@ async function apiRequest(url, options = {}) {
             console.error(
                 `API request failed: ${response.status} ${response.statusText}`
             );
+            // Still return the response so the caller can handle it
             return response;
         }
 

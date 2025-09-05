@@ -102,6 +102,24 @@ function updateNavigationState() {
                             ? "block"
                             : "none";
                     }
+
+                    // Show/hide orders links based on role
+                    const userOrdersLink =
+                        document.getElementById("user-orders-link");
+                    const adminOrdersLink =
+                        document.getElementById("admin-orders-link");
+
+                    if (userOrdersLink && adminOrdersLink) {
+                        if (isAdmin) {
+                            // Admin sees "همه سفارشات" (All Orders)
+                            userOrdersLink.style.display = "none";
+                            adminOrdersLink.style.display = "block";
+                        } else {
+                            // Regular users see "سفارشات من" (My Orders)
+                            userOrdersLink.style.display = "block";
+                            adminOrdersLink.style.display = "none";
+                        }
+                    }
                 } catch (e) {
                     if (dropdownRole) dropdownRole.textContent = "کاربر عادی";
 
@@ -110,6 +128,17 @@ function updateNavigationState() {
                         document.getElementById("wishlist-nav-item");
                     if (wishlistNavItem) {
                         wishlistNavItem.style.display = "none";
+                    }
+
+                    // Show user orders link by default if roles can't be parsed
+                    const userOrdersLink =
+                        document.getElementById("user-orders-link");
+                    const adminOrdersLink =
+                        document.getElementById("admin-orders-link");
+
+                    if (userOrdersLink && adminOrdersLink) {
+                        userOrdersLink.style.display = "block";
+                        adminOrdersLink.style.display = "none";
                     }
                 }
             }
