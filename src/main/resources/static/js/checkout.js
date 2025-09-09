@@ -68,9 +68,12 @@ async function loadCheckoutData() {
 // Calculate total amount
 function calculateTotalAmount(items) {
     return items.reduce((total, item) => {
-        const price = item.product?.productPrice || 0;
+        const originalPrice = item.product?.productPrice || 0;
+        const discount = item.product?.productDiscount || 0;
+        const discountedPrice =
+            originalPrice - (originalPrice * discount) / 100;
         const quantity = item.quantity || 0;
-        return total + price * quantity;
+        return total + discountedPrice * quantity;
     }, 0);
 }
 
@@ -104,8 +107,10 @@ function createSummaryItemElement(item) {
     const productName = item.product?.productName || "محصول نامشخص";
     const productImage = item.product?.productImages
         ? `/api/products/images/${extractFilename(item.product.productImages)}`
-        : "/images/placeholder.jpg";
-    const productPrice = item.product?.productPrice || 0;
+        : "/images/placeholder.svg";
+    const originalPrice = item.product?.productPrice || 0;
+    const discount = item.product?.productDiscount || 0;
+    const discountedPrice = originalPrice - (originalPrice * discount) / 100;
     const quantity = item.quantity || 0;
 
     const itemDiv = document.createElement("div");
@@ -113,12 +118,30 @@ function createSummaryItemElement(item) {
 
     itemDiv.innerHTML = `
         <img src="${productImage}" alt="${productName}" class="summary-item-image" 
-             onerror="this.src='/images/placeholder.jpg'">
+             onerror="this.src='/images/placeholder.svg'">
         <div class="summary-item-details">
             <div class="summary-item-name">${productName}</div>
-            <div class="summary-item-price">${formatPrice(
-                productPrice
-            )} تومان</div>
+            <div class="summary-item-price-info">
+                ${
+                    discount > 0
+                        ? `
+                    <div class="price-row">
+                        <span class="original-price">${formatPrice(
+                            originalPrice
+                        )} تومان</span>
+                        <span class="discount-badge">${discount}% تخفیف</span>
+                    </div>
+                    <div class="discounted-price">${formatPrice(
+                        discountedPrice
+                    )} تومان</div>
+                `
+                        : `
+                    <div class="summary-item-price">${formatPrice(
+                        originalPrice
+                    )} تومان</div>
+                `
+                }
+            </div>
         </div>
         <div class="summary-item-quantity">${quantity}</div>
     `;
@@ -155,34 +178,16 @@ async function proceedToPayment() {
             throw new Error("User ID not found");
         }
 
-        // Create order
-        const order = await createOrder(userId, totalAmount);
-        console.log("Created order:", order);
+        // Create order with totalAmount: 0
+        const order = await createOrder(userId);
 
-        // Handle different response formats
-        let orderId;
-        if (order && order.id) {
-            orderId = order.id;
-        } else if (order && order.orderId) {
-            orderId = order.orderId;
-        } else if (order && order.success) {
-            // If API returns success but no ID, we need to get the order ID differently
-            // For now, let's try to get the latest order for this user
-            console.warn(
-                "Order created successfully but no ID in response. Attempting to get latest order..."
-            );
-            const latestOrder = await getLatestOrderForUser(userId);
-            if (latestOrder && latestOrder.id) {
-                orderId = latestOrder.id;
-                console.log("Found latest order:", latestOrder);
-            } else {
-                throw new Error(
-                    "Order created but could not retrieve order ID"
-                );
-            }
-        } else {
-            throw new Error("Failed to create order or order missing ID");
+        // Get the latest order ID for this user (AFTER creating the order)
+        const latestOrder = await getLatestOrderForUser(userId);
+        if (!latestOrder || !latestOrder.id) {
+            throw new Error("Failed to get latest order ID");
         }
+
+        const orderId = latestOrder.id;
 
         // Store cart items in localStorage for later use in payment success
         localStorage.setItem(
@@ -196,11 +201,12 @@ async function proceedToPayment() {
         ).value;
 
         if (paymentMethod === "zarinpal") {
-            // Store amount in localStorage for payment verification
+            // Store amount and orderId in localStorage for payment verification
             localStorage.setItem(
                 `order_${orderId}_amount`,
                 totalAmount.toString()
             );
+            localStorage.setItem("currentOrderId", orderId.toString());
             // Initiate Zarinpal payment directly
             await initiateZarinpalPayment(totalAmount, orderId);
         } else {
@@ -230,7 +236,7 @@ async function proceedToPayment() {
 }
 
 // Create order
-async function createOrder(userId, totalAmount) {
+async function createOrder(userId) {
     try {
         const response = await apiRequest("/api/orders", {
             method: "POST",
@@ -239,7 +245,7 @@ async function createOrder(userId, totalAmount) {
             },
             body: JSON.stringify({
                 userId: parseInt(userId),
-                totalAmount: totalAmount,
+                totalAmount: 0,
             }),
         });
 
@@ -271,11 +277,17 @@ async function addOrderProducts(orderId) {
     console.log("Cart items:", cartItems);
 
     const promises = cartItems.map(async (item, index) => {
+        // Calculate discounted price
+        const originalPrice = item.product.productPrice;
+        const discount = item.product.productDiscount || 0;
+        const discountedPrice =
+            originalPrice - (originalPrice * discount) / 100;
+
         const requestBody = {
             order_id: orderId,
             product_id: item.product.productId,
             quantity: item.quantity,
-            priceAtOrderTime: item.product.productPrice,
+            priceAtOrderTime: discountedPrice, // Use discounted price
         };
 
         console.log(`Adding product ${index + 1}:`, requestBody);
@@ -423,10 +435,14 @@ async function getLatestOrderForUser(userId) {
         const response = await apiRequest(`/api/orders/user/${userId}`);
         if (response && response.ok) {
             const orders = await response.json();
-            // Return the most recent order (assuming they're sorted by date)
             if (orders && orders.length > 0) {
-                console.log("Found user orders:", orders);
-                return orders[0]; // Assuming orders are already sorted by date
+                // Sort orders by date (newest first)
+                const sortedOrders = orders.sort(
+                    (a, b) => new Date(b.date) - new Date(a.date)
+                );
+
+                // Return the most recent order
+                return sortedOrders[0];
             }
         }
         return null;
@@ -475,14 +491,12 @@ async function initiateZarinpalPayment(amount, orderId) {
             merchant_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", // Replace with your actual merchant ID
             amount: parseInt(amount),
             description: `پرداخت سفارش شماره ${orderId}`,
-            callback_url: `http://localhost:8080/callback?orderId=${orderId}`,
+            callback_url: `http://localhost:8080/callback`,
             metadata: {
                 user_id: userId || "1",
                 order_id: orderId.toString(),
             },
         };
-
-        console.log("Zarinpal request body:", requestBody);
 
         const response = await apiRequest("/api/zarin/request", {
             method: "POST",

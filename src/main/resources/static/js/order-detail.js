@@ -118,7 +118,24 @@ function displayOrderInfo() {
 // Update order summary
 function updateOrderSummary() {
     const productsCount = currentOrder.orderProducts?.length || 0;
-    const totalAmount = currentOrder.totalAmount || 0;
+
+    // Calculate original total and discounted total from order products
+    let totalOriginalPrice = 0;
+    let totalDiscountedPrice = 0;
+
+    if (currentOrder.orderProducts) {
+        currentOrder.orderProducts.forEach((item) => {
+            const originalPrice = item.product?.productPrice || 0;
+            const discountedPrice = item.priceAtOrderTime || 0;
+            const quantity = item.quantity || 0;
+
+            totalOriginalPrice += originalPrice * quantity;
+            totalDiscountedPrice += discountedPrice * quantity;
+        });
+    }
+
+    // Use our calculated total instead of backend total
+    const totalAmount = totalDiscountedPrice;
 
     // Update products count
     const productsCountElement = document.getElementById("products-count");
@@ -133,15 +150,28 @@ function updateOrderSummary() {
         summaryItemsCountElement.textContent = productsCount;
     }
 
+    // Update subtotal (original total)
     const summarySubtotalElement = document.getElementById("summary-subtotal");
     if (summarySubtotalElement) {
         summarySubtotalElement.textContent =
-            formatPrice(totalAmount) + " تومان";
+            formatPrice(totalOriginalPrice) + " تومان";
     }
 
+    // Update total (discounted total)
     const summaryTotalElement = document.getElementById("summary-total");
     if (summaryTotalElement) {
-        summaryTotalElement.textContent = formatPrice(totalAmount) + " تومان";
+        summaryTotalElement.textContent =
+            formatPrice(totalDiscountedPrice) + " تومان";
+    }
+
+    // Update savings if there's a discount
+    const savingsElement = document.getElementById("summary-savings");
+    if (savingsElement && totalOriginalPrice > totalDiscountedPrice) {
+        const savings = totalOriginalPrice - totalDiscountedPrice;
+        savingsElement.textContent = formatPrice(savings) + " تومان";
+        savingsElement.parentElement.style.display = "flex";
+    } else if (savingsElement) {
+        savingsElement.parentElement.style.display = "none";
     }
 }
 
@@ -270,14 +300,17 @@ function createProductElement(item) {
     const productName = item.product?.productName || "محصول نامشخص";
     const productImage = item.product?.productImages
         ? `/api/products/images/${extractFilename(item.product.productImages)}`
-        : "/images/placeholder.jpg";
-    const productPrice = item.priceAtOrderTime || 0;
+        : "/images/placeholder.svg";
+    const originalPrice = item.product?.productPrice || 0; // This is the original price
+    const discount = item.product?.productDiscount || 0;
+    const discountedPrice = item.priceAtOrderTime || 0; // This is the discounted price at order time
     const quantity = item.quantity || 0;
-    const totalPrice = productPrice * quantity;
+    const totalOriginalPrice = originalPrice * quantity;
+    const totalDiscountedPrice = discountedPrice * quantity;
 
     productDiv.innerHTML = `
         <img src="${productImage}" alt="${productName}" class="product-image" 
-             onerror="this.src='/images/placeholder.jpg'">
+             onerror="this.src='/images/placeholder.svg'">
         <div class="product-info">
             <h4>${productName}</h4>
             <div class="product-details">
@@ -285,11 +318,49 @@ function createProductElement(item) {
                     <i class="fas fa-box"></i>
                     ${quantity} عدد
                 </div>
-                <div class="product-price">${formatPrice(
-                    productPrice
-                )} تومان</div>
+                <div class="product-price-info">
+                    ${
+                        discount > 0
+                            ? `
+                        <div class="price-row">
+                            <span class="original-price">قیمت اصلی: ${formatPrice(
+                                originalPrice
+                            )} تومان</span>
+                            <span class="discount-badge">${discount}% تخفیف</span>
+                        </div>
+                         <div class="discounted-price">قیمت با تخفیف: ${formatPrice(
+                             discountedPrice
+                         )} تومان</div>
+                    `
+                            : `
+                        <div class="product-price">${formatPrice(
+                            originalPrice
+                        )} تومان</div>
+                    `
+                    }
+                </div>
             </div>
-            <div class="product-total">${formatPrice(totalPrice)} تومان</div>
+            <div class="product-total">
+                ${
+                    discount > 0
+                        ? `
+                    <div class="total-row">
+                        <span class="original-total">${formatPrice(
+                            totalOriginalPrice
+                        )} تومان</span>
+                         <span class="discounted-total">${formatPrice(
+                             totalDiscountedPrice
+                         )} تومان</span>
+                    </div>
+                    <div class="savings">صرفه‌جویی: ${formatPrice(
+                        totalOriginalPrice - totalDiscountedPrice
+                    )} تومان</div>
+                `
+                        : `
+                    ${formatPrice(totalOriginalPrice)} تومان
+                `
+                }
+            </div>
         </div>
     `;
 

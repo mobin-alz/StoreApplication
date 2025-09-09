@@ -22,6 +22,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Load orders
     loadOrders();
+
+    // Update countdown timers every minute
+    setInterval(() => {
+        updateCountdownTimers();
+    }, 60000); // Update every minute
 });
 
 // Initialize event listeners
@@ -71,6 +76,9 @@ async function loadOrders() {
 
         orders = await response.json();
 
+        // Check for PENDING orders that might need products added
+        await checkPendingOrders();
+
         if (orders.length === 0) {
             showEmptyState();
         } else {
@@ -98,7 +106,7 @@ function applyFilters() {
             const orderId = order.id.toString();
             const orderDate = new Date(order.date).toLocaleDateString("fa-IR");
             const statusText = getStatusText(order.status);
-            const totalAmount = formatPrice(order.totalAmount);
+            const totalAmount = formatPrice(calculateOrderTotal(order));
 
             const searchableText =
                 `${orderId} ${orderDate} ${statusText} ${totalAmount}`.toLowerCase();
@@ -126,7 +134,7 @@ function updateOrderStats() {
     ).length;
     const totalSpent = orders
         .filter((order) => order.status !== "CANCELED")
-        .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        .reduce((sum, order) => sum + calculateOrderTotal(order), 0);
 
     // Update stats elements
     const totalOrdersElement = document.getElementById("total-orders");
@@ -215,10 +223,18 @@ function createOrderElement(order) {
                 ${
                     order.status === "PENDING"
                         ? `
-                    <button class="btn btn-payment" onclick="retryPayment(${order.id})">
-                        <i class="fas fa-credit-card"></i>
-                        تکمیل پرداخت
-                    </button>
+                    <div class="pending-info">
+                        <div class="time-remaining">
+                            <i class="fas fa-clock"></i>
+                            ${getTimeRemaining(order.date)}
+                        </div>
+                        <button class="btn btn-payment" onclick="retryPayment(${
+                            order.id
+                        })">
+                            <i class="fas fa-credit-card"></i>
+                            تکمیل پرداخت
+                        </button>
+                    </div>
                 `
                         : ""
                 }
@@ -277,9 +293,24 @@ function createOrderElement(order) {
                 <div class="summary-item total">
                     <span class="summary-label">مبلغ کل:</span>
                     <span class="summary-value">${formatPrice(
-                        order.totalAmount
+                        calculateOrderTotal(order)
                     )} تومان</span>
                 </div>
+                ${
+                    order.orderProducts &&
+                    order.orderProducts.some(
+                        (item) => item.product?.productDiscount > 0
+                    )
+                        ? `
+                    <div class="summary-item discount">
+                        <span class="summary-label">تخفیف اعمال شده:</span>
+                        <span class="summary-value discount-value">
+                            ${formatPrice(calculateTotalDiscount(order))} تومان
+                        </span>
+                    </div>
+                `
+                        : ""
+                }
             </div>
         </div>
         
@@ -311,13 +342,13 @@ function createOrderItemHTML(item) {
     const productName = item.product?.productName || "محصول نامشخص";
     const productImage = item.product?.productImages
         ? `/api/products/images/${extractFilename(item.product.productImages)}`
-        : "/images/placeholder.jpg";
+        : "/images/placeholder.svg";
     const quantity = item.quantity || 0;
 
     return `
         <div class="order-item">
             <img src="${productImage}" alt="${productName}" class="order-item-image" 
-                 onerror="this.src='/images/placeholder.jpg'">
+                 onerror="this.src='/images/placeholder.svg'">
             <div class="order-item-details">
                 <div class="order-item-name">${productName}</div>
                 <div class="order-item-quantity">تعداد: ${quantity}</div>
@@ -484,6 +515,79 @@ function hideAllStates() {
     document.getElementById("error-state").style.display = "none";
 }
 
+// Calculate total discount for an order
+// Calculate total amount for an order from order products
+function calculateOrderTotal(order) {
+    if (!order.orderProducts) return 0;
+
+    return order.orderProducts.reduce((totalAmount, item) => {
+        const discountedPrice = item.priceAtOrderTime || 0;
+        const quantity = item.quantity || 0;
+
+        return totalAmount + discountedPrice * quantity;
+    }, 0);
+}
+
+function calculateTotalDiscount(order) {
+    if (!order.orderProducts) return 0;
+
+    return order.orderProducts.reduce((totalDiscount, item) => {
+        const originalPrice = item.product?.productPrice || 0;
+        const discount = item.product?.productDiscount || 0;
+        const quantity = item.quantity || 0;
+
+        if (discount > 0) {
+            const discountAmount =
+                ((originalPrice * discount) / 100) * quantity;
+            return totalDiscount + discountAmount;
+        }
+        return totalDiscount;
+    }, 0);
+}
+
+// Calculate time remaining for PENDING orders (24 hours from creation)
+function getTimeRemaining(orderDate) {
+    const orderTime = new Date(orderDate);
+    const now = new Date();
+    const timeDiff = orderTime.getTime() + 24 * 60 * 60 * 1000 - now.getTime(); // 24 hours from order time
+
+    if (timeDiff <= 0) {
+        return "منقضی شده";
+    }
+
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${hours} ساعت و ${minutes} دقیقه`;
+}
+
+// Update countdown timers for PENDING orders
+function updateCountdownTimers() {
+    const timeRemainingElements = document.querySelectorAll(".time-remaining");
+    timeRemainingElements.forEach((element) => {
+        const orderCard = element.closest(".order-card");
+        if (orderCard) {
+            const orderId = orderCard
+                .querySelector(".order-info h3")
+                ?.textContent?.match(/\d+/)?.[0];
+            if (orderId) {
+                const order = orders.find((o) => o.id == orderId);
+                if (order && order.status === "PENDING") {
+                    const newTimeRemaining = getTimeRemaining(order.date);
+                    element.innerHTML = `<i class="fas fa-clock"></i> ${newTimeRemaining}`;
+
+                    // If expired, refresh the page to remove the order
+                    if (newTimeRemaining === "منقضی شده") {
+                        setTimeout(() => {
+                            loadOrders();
+                        }, 2000);
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Format price with thousand separators
 function formatPrice(price) {
     return new Intl.NumberFormat("fa-IR").format(Math.round(price));
@@ -521,4 +625,110 @@ function showMessage(message, type = "info") {
             messageElement.remove();
         }
     }, 5000);
+}
+
+// Check for PENDING orders that might need products added
+async function checkPendingOrders() {
+    const pendingOrders = orders.filter(
+        (order) =>
+            order.status === "PENDING" &&
+            (!order.orderProducts || order.orderProducts.length === 0)
+    );
+
+    for (const order of pendingOrders) {
+        console.log("Found PENDING order without products:", order.id);
+
+        // Check if we have cart items stored for this order
+        const cartItemsJson = localStorage.getItem(
+            `order_${order.id}_cartItems`
+        );
+        if (cartItemsJson) {
+            console.log("Found stored cart items for order:", order.id);
+            try {
+                await addOrderProductsToOrder(order.id);
+                console.log("Added products to order:", order.id);
+            } catch (error) {
+                console.error(
+                    "Error adding products to order:",
+                    order.id,
+                    error
+                );
+            }
+        }
+    }
+}
+
+// Add order products to order (copied from callback.js)
+async function addOrderProductsToOrder(orderId) {
+    try {
+        console.log("Adding order products for orderId:", orderId);
+
+        // Get cart items from localStorage
+        const cartItemsJson = localStorage.getItem(
+            `order_${orderId}_cartItems`
+        );
+        if (!cartItemsJson) {
+            console.warn("No cart items found for order:", orderId);
+            return;
+        }
+
+        const cartItems = JSON.parse(cartItemsJson);
+        console.log("Cart items:", cartItems);
+
+        const promises = cartItems.map(async (item, index) => {
+            // Calculate discounted price
+            const originalPrice = item.product.productPrice;
+            const discount = item.product.productDiscount || 0;
+            const discountedPrice =
+                originalPrice - (originalPrice * discount) / 100;
+
+            const requestBody = {
+                order_id: parseInt(orderId),
+                product_id: item.product.productId,
+                quantity: item.quantity,
+                priceAtOrderTime: discountedPrice,
+            };
+
+            console.log(`Adding product ${index + 1}:`, requestBody);
+
+            try {
+                const response = await apiRequest("/api/order-product/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response || !response.ok) {
+                    console.error(
+                        `Failed to add product ${index + 1}:`,
+                        response.status,
+                        response.statusText
+                    );
+                    return null;
+                }
+
+                const result = await response.json();
+                console.log(`Successfully added product ${index + 1}:`, result);
+                return result;
+            } catch (error) {
+                console.error(`Error adding product ${index + 1}:`, error);
+                return null;
+            }
+        });
+
+        const results = await Promise.all(promises);
+        console.log("All order products results:", results);
+
+        // Check if any products failed to add
+        const failedProducts = results.filter((result) => result === null);
+        if (failedProducts.length > 0) {
+            console.warn(
+                `${failedProducts.length} products failed to add to order`
+            );
+        }
+    } catch (error) {
+        console.error("Error adding order products:", error);
+    }
 }

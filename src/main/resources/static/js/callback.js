@@ -29,11 +29,27 @@ document.addEventListener("DOMContentLoaded", function () {
 // Process the Zarinpal callback
 async function processCallback() {
     try {
+        // Get URL parameters first
+        const urlParams = new URLSearchParams(window.location.search);
+        const authority = urlParams.get("Authority");
+        const status = urlParams.get("Status");
+
+        // Get orderId from localStorage
+        const orderId = localStorage.getItem("currentOrderId");
+
+        if (!orderId) {
+            showError("شناسه سفارش یافت نشد");
+            return;
+        }
+
         // Check if we have the required parameters
         if (!authority || !status) {
             showError("پارامترهای پرداخت یافت نشد");
             return;
         }
+
+        // Always add products to the order (regardless of payment status)
+        await addOrderProductsToOrder(orderId);
 
         // Check payment status
         if (status === "OK") {
@@ -52,19 +68,20 @@ async function processCallback() {
 // Handle successful payment
 async function handleSuccessfulPayment() {
     try {
-        // Get order ID from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get("orderId");
+        // Get order ID from localStorage (stored during payment initiation)
+        const orderId = localStorage.getItem("currentOrderId");
 
         if (orderId) {
-            // Add order products
-            await addOrderProductsToOrder(orderId);
-
             // Update order status to PAID
             await updateOrderStatus(orderId, "PAID");
 
             // Clear the shopping cart
             await clearShoppingCart();
+
+            // Clean up localStorage after successful payment
+            localStorage.removeItem(`order_${orderId}_cartItems`);
+            localStorage.removeItem(`order_${orderId}_amount`);
+            localStorage.removeItem("currentOrderId");
         }
 
         // Show success state
@@ -82,10 +99,36 @@ async function handleSuccessfulPayment() {
 }
 
 // Handle failed payment
-function handleFailedPayment() {
-    // Get order ID from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get("orderId");
+async function handleFailedPayment() {
+    // Get order ID from localStorage (stored during payment initiation)
+    const orderId = localStorage.getItem("currentOrderId");
+
+    // Set a timer to delete the order after 24 hours if not paid
+    if (orderId) {
+        setTimeout(async () => {
+            try {
+                // Check if order is still PENDING
+                const orderResponse = await apiRequest(
+                    `/api/orders/${orderId}`
+                );
+                if (orderResponse && orderResponse.ok) {
+                    const order = await orderResponse.json();
+                    if (order.status === "PENDING") {
+                        console.log(
+                            "Deleting order after 24 hours due to non-payment"
+                        );
+                        await apiRequest(`/api/orders/${orderId}`, {
+                            method: "DELETE",
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error deleting expired order:", error);
+            }
+        }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+
+        console.log("Order will be deleted after 24 hours if not paid");
+    }
 
     // Show error state
     document.getElementById("loading-state").style.display = "none";
@@ -129,12 +172,25 @@ async function retryPayment(orderId) {
         // Get order details to get the amount
         const response = await apiRequest(`/api/orders/${orderId}`);
         if (!response || !response.ok) {
+            // If order doesn't exist, redirect to checkout to create a new one
+            if (response.status === 404) {
+                alert("سفارش یافت نشد. در حال انتقال به صفحه تسویه حساب...");
+                window.location.href = "/checkout";
+                return;
+            }
             alert("خطا در دریافت اطلاعات سفارش");
             return;
         }
 
         const order = await response.json();
         const amount = order.totalAmount;
+
+        // Check if order is still PENDING
+        if (order.status !== "PENDING") {
+            alert("این سفارش قبلاً پرداخت شده است");
+            window.location.href = "/dashboard/orders";
+            return;
+        }
 
         // Store order info for callback
         localStorage.setItem(`order_${orderId}_amount`, amount.toString());
@@ -204,28 +260,39 @@ function goToHome() {
 // Add order products to order
 async function addOrderProductsToOrder(orderId) {
     try {
+        // First check if order already has products
+        const orderResponse = await apiRequest(`/api/orders/${orderId}`);
+        if (orderResponse && orderResponse.ok) {
+            const order = await orderResponse.json();
+            if (order.orderProducts && order.orderProducts.length > 0) {
+                return;
+            }
+        }
+
         // Get cart items from localStorage
         const cartItemsJson = localStorage.getItem(
             `order_${orderId}_cartItems`
         );
+
         if (!cartItemsJson) {
-            console.warn("No cart items found for order:", orderId);
             return;
         }
 
         const cartItems = JSON.parse(cartItemsJson);
-        console.log("Adding order products for order ID:", orderId);
-        console.log("Cart items:", cartItems);
 
         const promises = cartItems.map(async (item, index) => {
+            // Calculate discounted price
+            const originalPrice = item.product.productPrice;
+            const discount = item.product.productDiscount || 0;
+            const discountedPrice =
+                originalPrice - (originalPrice * discount) / 100;
+
             const requestBody = {
                 order_id: parseInt(orderId),
                 product_id: item.product.productId,
                 quantity: item.quantity,
-                priceAtOrderTime: item.product.productPrice,
+                priceAtOrderTime: discountedPrice, // Use discounted price
             };
-
-            console.log(`Adding product ${index + 1}:`, requestBody);
 
             try {
                 const response = await apiRequest("/api/order-product/", {
@@ -237,27 +304,20 @@ async function addOrderProductsToOrder(orderId) {
                 });
 
                 if (!response || !response.ok) {
-                    console.error(
-                        `Failed to add product ${index + 1}:`,
-                        response.status,
-                        response.statusText
-                    );
                     const errorText = await response.text();
-                    console.error("Error response:", errorText);
+                    console.error("Error adding product:", errorText);
                     return null;
                 }
 
                 const result = await response.json();
-                console.log(`Successfully added product ${index + 1}:`, result);
                 return result;
             } catch (error) {
-                console.error(`Error adding product ${index + 1}:`, error);
+                console.error("Error adding product:", error);
                 return null;
             }
         });
 
         const results = await Promise.all(promises);
-        console.log("All order products results:", results);
 
         // Check if any products failed to add
         const failedProducts = results.filter((result) => result === null);
@@ -266,9 +326,6 @@ async function addOrderProductsToOrder(orderId) {
                 `${failedProducts.length} products failed to add to order`
             );
         }
-
-        // Clean up localStorage
-        localStorage.removeItem(`order_${orderId}_cartItems`);
     } catch (error) {
         console.error("Error adding order products:", error);
     }

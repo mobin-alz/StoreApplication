@@ -146,7 +146,7 @@ function applyFilters() {
             const orderId = order.id.toString();
             const orderDate = new Date(order.date).toLocaleDateString("fa-IR");
             const statusText = getStatusText(order.status);
-            const totalAmount = formatPrice(order.totalAmount);
+            const totalAmount = formatPrice(calculateOrderTotal(order));
             const customerId = order.user?.id?.toString() || "";
 
             const searchableText =
@@ -175,7 +175,7 @@ function updateOrderStats() {
     ).length;
     const totalRevenue = orders
         .filter((order) => order.status !== "CANCELED")
-        .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        .reduce((sum, order) => sum + calculateOrderTotal(order), 0);
 
     // Update stats elements
     const totalOrdersElement = document.getElementById("total-orders");
@@ -290,9 +290,24 @@ function createOrderElement(order) {
             <div class="detail-item">
                 <div class="detail-label">مبلغ کل</div>
                 <div class="detail-value">${formatPrice(
-                    order.totalAmount
+                    calculateOrderTotal(order)
                 )} تومان</div>
             </div>
+            ${
+                order.orderProducts &&
+                order.orderProducts.some(
+                    (item) => item.product?.productDiscount > 0
+                )
+                    ? `
+                <div class="detail-item">
+                    <div class="detail-label">تخفیف اعمال شده</div>
+                    <div class="detail-value discount-value">${formatPrice(
+                        calculateTotalDiscount(order)
+                    )} تومان</div>
+                </div>
+            `
+                    : ""
+            }
             <div class="detail-item">
                 <div class="detail-label">محصولات</div>
                 <div class="products-preview">
@@ -443,6 +458,36 @@ function hideAllStates() {
     document.getElementById("empty-state").style.display = "none";
     document.getElementById("orders-content").style.display = "none";
     document.getElementById("error-state").style.display = "none";
+}
+
+// Calculate total discount for an order
+// Calculate total amount for an order from order products
+function calculateOrderTotal(order) {
+    if (!order.orderProducts) return 0;
+
+    return order.orderProducts.reduce((totalAmount, item) => {
+        const discountedPrice = item.priceAtOrderTime || 0;
+        const quantity = item.quantity || 0;
+
+        return totalAmount + discountedPrice * quantity;
+    }, 0);
+}
+
+function calculateTotalDiscount(order) {
+    if (!order.orderProducts) return 0;
+
+    return order.orderProducts.reduce((totalDiscount, item) => {
+        const originalPrice = item.product?.productPrice || 0;
+        const discount = item.product?.productDiscount || 0;
+        const quantity = item.quantity || 0;
+
+        if (discount > 0) {
+            const discountAmount =
+                ((originalPrice * discount) / 100) * quantity;
+            return totalDiscount + discountAmount;
+        }
+        return totalDiscount;
+    }, 0);
 }
 
 // Format price with thousand separators

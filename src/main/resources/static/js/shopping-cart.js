@@ -84,25 +84,43 @@ function createCartItemElement(item) {
     const productName = item.product?.productName || "محصول نامشخص";
     const productImage = item.product?.productImages
         ? `/api/products/images/${extractFilename(item.product.productImages)}`
-        : "/images/placeholder.jpg";
-    const productPrice = item.product?.productPrice || 0;
+        : "/images/placeholder.svg";
+    const originalPrice = item.product?.productPrice || 0;
+    const discount = item.product?.productDiscount || 0;
+    const discountedPrice = originalPrice - (originalPrice * discount) / 100;
     const quantity = item.quantity || 1;
     const maxQuantity = item.product?.productQuantity || 1;
 
     cartItemDiv.innerHTML = `
         <img src="${productImage}" alt="${productName}" class="cart-item-image" 
-             onerror="this.src='/images/placeholder.jpg'"
+             onerror="this.src='/images/placeholder.svg'"
              onclick="goToProduct(${item.product.productId})">
         
         <div class="cart-item-details" onclick="goToProduct(${
             item.product.productId
         })">
             <h4>${productName}</h4>
-            <p>قیمت واحد: ${formatPrice(productPrice)} تومان</p>
+            <div class="price-info">
+                ${
+                    discount > 0
+                        ? `
+                    <p class="original-price">قیمت اصلی: ${formatPrice(
+                        originalPrice
+                    )} تومان</p>
+                    <p class="discounted-price">قیمت با تخفیف: ${formatPrice(
+                        discountedPrice
+                    )} تومان</p>
+                    <span class="discount-badge">${discount}% تخفیف</span>
+                `
+                        : `
+                    <p>قیمت واحد: ${formatPrice(originalPrice)} تومان</p>
+                `
+                }
+            </div>
         </div>
         
         <div class="cart-item-price">
-            ${formatPrice(productPrice * quantity)} تومان
+            ${formatPrice(discountedPrice * quantity)} تومان
         </div>
         
         <div class="cart-item-quantity">
@@ -149,13 +167,19 @@ async function updateQuantity(itemId, newQuantity) {
             return;
         }
 
+        // Calculate discounted price for API
+        const originalPrice = item.product?.productPrice || 0;
+        const discount = item.product?.productDiscount || 0;
+        const discountedPrice =
+            originalPrice - (originalPrice * discount) / 100;
+
         // Update quantity via API
         const result = await updateCartItem(
             itemId,
             currentCart.id,
             item.product.productId,
             newQuantity,
-            item.product.productPrice
+            discountedPrice
         );
 
         if (result) {
@@ -255,10 +279,13 @@ function proceedToCheckout() {
 // Update cart summary
 function updateCartSummary() {
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = cartItems.reduce(
-        (sum, item) => sum + (item.product?.productPrice || 0) * item.quantity,
-        0
-    );
+    const totalPrice = cartItems.reduce((sum, item) => {
+        const originalPrice = item.product?.productPrice || 0;
+        const discount = item.product?.productDiscount || 0;
+        const discountedPrice =
+            originalPrice - (originalPrice * discount) / 100;
+        return sum + discountedPrice * item.quantity;
+    }, 0);
 
     // Update items count in header
     const itemsCountElement = document.getElementById("items-count");

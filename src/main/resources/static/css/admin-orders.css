@@ -353,6 +353,11 @@
     font-family: vazir;
 }
 
+.discount-value {
+    color: #ef4444 !important;
+    font-weight: 600 !important;
+}
+
 .customer-info {
     display: flex;
     flex-direction: column;

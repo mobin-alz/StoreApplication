@@ -406,6 +406,53 @@
     font-size: 1.1rem;
 }
 
+.summary-item.discount .summary-value {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.discount-value {
+    color: #ef4444 !important;
+    font-weight: 600 !important;
+}
+
+/* Pending order countdown styles */
+.pending-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.time-remaining {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+    animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px rgba(251, 191, 36, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+    }
+}
+
 /* Button Styles */
 .btn-payment {
     background: linear-gradient(135deg, #10b981, #059669);
